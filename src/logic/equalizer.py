@@ -1,5 +1,5 @@
 import numpy as np
-from src.filters import fir_filter
+from src.logic.filters import fir_filter
 
 def split_into_bands(x: np.ndarray, fs: int):
     # Low band: 0-300 Hz

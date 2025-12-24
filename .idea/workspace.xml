@@ -4,17 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Add equalizer functions for band splitting, merging, and gain adjustment">
-      <change afterPath="$PROJECT_DIR$/data/LA_Piano.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PythonProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PythonProject.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/acquisition.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/filters.py" afterDir="false" />
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Update project configuration files to exclude `.venv` and set Python SDK to 3.13">
+      <change afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equalizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/equalizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/filters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/modulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,12 +174,48 @@
       <option name="project" value="LOCAL" />
       <updated>1766583421384</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add signal modulation function supporting AM, DSB-SC, and FM">
+      <option name="closed" value="true" />
+      <created>1766583504878</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766583504878</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add FIR filter function with support for low-pass, high-pass, and bandpass filtering">
+      <option name="closed" value="true" />
+      <created>1766583616617</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1766583616617</updated>
+    </task>
+    <task id="LOCAL-00005" summary="First_Version: Add graph plotting utilities, including 2D plot generation, side-by-side plotting, and band visualizations in time and frequency domains">
+      <option name="closed" value="true" />
+      <created>1766583672570</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1766583672570</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Update project configuration files to exclude `.venv` and set Python SDK to 3.13">
+      <option name="closed" value="true" />
+      <created>1766583723340</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1766583723340</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add audio I/O utility functions for loading, saving, recording, converting to mono, and playback" />
     <MESSAGE value="Add equalizer functions for band splitting, merging, and gain adjustment" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add equalizer functions for band splitting, merging, and gain adjustment" />
+    <MESSAGE value="Add signal modulation function supporting AM, DSB-SC, and FM" />
+    <MESSAGE value="Add FIR filter function with support for low-pass, high-pass, and bandpass filtering" />
+    <MESSAGE value="First_Version: Add graph plotting utilities, including 2D plot generation, side-by-side plotting, and band visualizations in time and frequency domains" />
+    <MESSAGE value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
   </component>
 </project>
