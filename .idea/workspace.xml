@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Update project configuration files to exclude `.venv` and set Python SDK to 3.13">
-      <change afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/equalizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/equalizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/filters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/gui.py" afterDir="false" />
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions">
+      <change afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +66,7 @@
       <recent name="C:\Users\loryp\PycharmProjects\PythonProject\data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\loryp\PycharmProjects\PythonProject\src\logic" />
       <recent name="C:\Users\loryp\PycharmProjects\PythonProject\src" />
     </key>
   </component>
@@ -206,7 +201,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766583723340</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions">
+      <option name="closed" value="true" />
+      <created>1766583817703</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1766583817703</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -216,6 +219,7 @@
     <MESSAGE value="Add FIR filter function with support for low-pass, high-pass, and bandpass filtering" />
     <MESSAGE value="First_Version: Add graph plotting utilities, including 2D plot generation, side-by-side plotting, and band visualizations in time and frequency domains" />
     <MESSAGE value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
+    <MESSAGE value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
   </component>
 </project>

@@ -9,7 +9,7 @@ from src.logic.modulation import modulate_signal
 from src.logic.utils import plot_graph, plot_two_graphs_side_by_side, plot_bands_time, plot_bands_frequency
 
 
-def main():
+def pipeline_test():
     # Acquisition of the signal
     x_in, fs = load_audio("./../data/LA_Piano.wav")
     print(f"Sample rate: {fs} Hz")
@@ -70,6 +70,13 @@ def main():
     plot_graph(spectrogram_analysis(x_am, fs))
 
     # Saving/Reproducing signal
+
+def main():
+    # pipeline_test()
+    from src.gui.gui import AudioDSPApp
+    app = AudioDSPApp()
+    app.mainloop()
+    pass
 
 
 if __name__ == "__main__":
