@@ -11,11 +11,8 @@ from src.logic.utils import plot_graph, plot_two_graphs_side_by_side, plot_bands
 
 def pipeline_test():
     # Acquisition of the signal
-    x_in, fs = load_audio("./../data/LA_Piano.wav")
+    x, fs = load_audio("./../data/LA_Piano.wav")
     print(f"Sample rate: {fs} Hz")
-
-    # Ensure mono
-    x = to_mono(x_in)
 
     # Plot time domain
     plot_graph(create_time_plot(x, fs))

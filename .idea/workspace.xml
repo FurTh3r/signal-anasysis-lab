@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AIDiffSettings">
+    <option name="showAIDiff" value="true" />
+  </component>
+  <component name="AIDiffStorage" id="1">
+    <groups>
+      <group changeListId="f86a03c6-678b-4012-ab6d-6fe7627818db" id="1" name="Update 'workspace.xml' with new GUI commit message and task counter" description="Updates the IDE's workspace configuration to reflect a new commit message and increment the local task counter." importance="0.6">
+        <files>
+          <file summary="Updates the `.idea/workspace.xml` file to include a new commit message for GUI implementation and increments the 'localTasksCounter' from 8 to 9, reflecting recent version control activity." importance="0.6" isPending="false">
+            <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+            <ranges>
+              <range afterLine1="6" afterLine2="7" beforeLine1="6" beforeLine2="11" groupId="1" />
+              <range afterLine1="207" afterLine2="216" beforeLine1="211" beforeLine2="212" groupId="1" />
+              <range afterLine1="226" afterLine2="228" beforeLine1="222" beforeLine2="223" groupId="1" />
+            </ranges>
+          </file>
+        </files>
+      </group>
+    </groups>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions">
-      <change afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features">
+      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+    </list>
+    <list id="f86a03c6-678b-4012-ab6d-6fe7627818db" name="Update 'workspace.xml' with new GUI commit message and task counter" comment="Updates the IDE's workspace configuration to reflect a new commit message and increment the local task counter.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,7 +37,8 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="19" />
+    <option name="cachedIndexableFilesCount" value="21" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -39,6 +62,10 @@
     &quot;accountId&quot;: &quot;bc357787-2b9a-45ba-96e7-2b85deae2ff3&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -54,6 +81,7 @@
     &quot;Python.analysis.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.utils.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
@@ -61,6 +89,13 @@
     &quot;last_opened_file_path&quot;: &quot;C:/Users/loryp/PycharmProjects/PythonProject/data&quot;
   }
 }</component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1769166017551" />
+    <option name="spentUsd" value="0.104598634" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="0" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\loryp\PycharmProjects\PythonProject\data" />
@@ -141,7 +176,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-0978a7220b69-9867c7d4c0a4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.28294.336" />
+        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
       </set>
     </attachedChunks>
   </component>
@@ -209,7 +244,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766583817703</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features">
+      <option name="closed" value="true" />
+      <created>1766596860930</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766596860930</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -220,6 +263,7 @@
     <MESSAGE value="First_Version: Add graph plotting utilities, including 2D plot generation, side-by-side plotting, and band visualizations in time and frequency domains" />
     <MESSAGE value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
     <MESSAGE value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
+    <MESSAGE value="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features" />
   </component>
 </project>

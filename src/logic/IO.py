@@ -6,15 +6,7 @@ def load_audio(file_path: str) -> tuple[np.ndarray, int]:
     x, fs = sf.read(file_path)
     if x.dtype != np.float32:
         x = x.astype(np.float32)
-    return x, fs
-
-def record_audio(duration: float = 5.0, fs: int = 44100) -> np.ndarray:
-    print(f"Recording for {duration} seconds...")
-    x = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='float32')
-    sd.wait()  # wait until recording is finished
-    x = x.flatten()  # convert to 1D array
-    print("Recording finished.")
-    return x
+    return to_mono(x), fs
 
 def to_mono(x: np.ndarray) -> np.ndarray:
     if x.ndim == 1:
