@@ -121,6 +121,17 @@ def generate_sinusoid(frequency, amplitude, phase, duration, fs):
     signal = amplitude * np.sin(2 * np.pi * frequency * t + phase)
     return signal, t
 
+
+def show_error(message: str, title: str = "Errore"):
+    """
+    Mostra una finestra di errore con messaggio e titolo.
+
+    :param message: Testo dell'errore
+    :param title: Titolo della finestra (default: "Errore")
+    """
+    messagebox.showerror(title, message)
+
+
 class AudioDSPApp(tk.Tk):
     """
     The main application class for a graphical user interface (GUI) toolkit designed for audio DSP (Digital Signal Processing).
@@ -133,10 +144,6 @@ class AudioDSPApp(tk.Tk):
         Initializes the main application for the Audio DSP Toolkit.
         """
         super().__init__()
-
-        self.phase_entry = None
-        self.amp_entry = None
-        self.freq_entry = None
         self.title("Audio DSP Toolkit")
         self.configure(bg=BG_MAIN)
 
@@ -169,6 +176,10 @@ class AudioDSPApp(tk.Tk):
         self.canvas_time2 = None
         self.ax_time2 = None
         self.fig_time2 = None
+        self.dur_entry = None
+        self.phase_entry = None
+        self.amp_entry = None
+        self.freq_entry = None
 
         # =========================
         # Style Settings
@@ -287,6 +298,14 @@ class AudioDSPApp(tk.Tk):
         self.phase_entry.insert(0, "0.0")  # valore di default
         self.phase_entry.pack(side="left", padx=5)
 
+        # Duration
+        dur_frame = ttk.Frame(frame_generate)
+        dur_frame.pack(fill="x", pady=2)
+        ttk.Label(dur_frame, text="Duration [s]").pack(side="left")
+        self.dur_entry = ttk.Entry(dur_frame, width=10)
+        self.dur_entry.insert(0, "1.0")
+        self.dur_entry.pack(side="left", padx=5)
+
         # Pulsante Generate
         ttk.Button(frame_generate, text="Generate", command=self.generate_sinusoid).pack(pady=5)
 
@@ -297,15 +316,9 @@ class AudioDSPApp(tk.Tk):
         self.volume_value_label = ttk.Label(vol_frame, text="1.00")
         self.volume_value_label.pack()
 
-        self.volume_slider = tk.Scale(
-            vol_frame,
-            from_=1.0,
-            to=0.0,
-            resolution=0.01,
-            orient="vertical",
-            length=120,
-            command=self.on_volume_change  # callback
-        )
+        self.volume_slider = tk.Scale(vol_frame, from_=1.0, to=0.0, resolution=0.01, orient="vertical", length=120,
+                                      command=self.on_volume_change  # callback
+                                      )
         self.volume_slider.set(1.0)
         self.volume_slider.pack()
 
@@ -337,8 +350,11 @@ class AudioDSPApp(tk.Tk):
         self.k_slider = tk.Scale(frame_mod, from_=0.0, to=5.0, orient="horizontal", length=120, resolution=0.01)
         self.k_slider.set(0.5)
         self.k_slider.pack(side="left")
+
         ttk.Checkbutton(frame_mod, text="Enable Modulation", variable=self.modulation_enabled).pack(side="left",
                                                                                                     padx=10)
+        self.mod_type_var.trace_add("write", self.update_modulation_controls)
+        self.update_modulation_controls()
 
         # =======================
         # Apply Processing
@@ -395,6 +411,27 @@ class AudioDSPApp(tk.Tk):
     # Audio GUI logic
     # =========================
 
+    def update_modulation_controls(self, *args): #TODO fix
+        mod_type = self.mod_type_var.get()
+
+        if not self.modulation_enabled.get():
+            self.fc_slider.config(state="disabled")
+            self.k_slider.config(state="disabled")
+            return
+
+        if mod_type == "AM":
+            self.fc_slider.config(state="normal")
+            self.k_slider.config(state="normal")
+        elif mod_type == "DSB-SC":
+            self.fc_slider.config(state="normal")
+            self.k_slider.config(state="disabled")
+        elif mod_type == "FM":
+            self.fc_slider.config(state="normal")
+            self.k_slider.config(state="normal")
+        else:
+            self.fc_slider.config(state="disabled")
+            self.k_slider.config(state="disabled")
+
     def load_audio(self):
         """
         Loads an audio file and initializes the audio signal and sampling frequency.
@@ -431,7 +468,7 @@ class AudioDSPApp(tk.Tk):
         :return: None
         """
         if self.audio_signal_modified is None:
-            print("No signal to play")
+            show_error("No signal loaded. Please load a signal first.")
             return
 
         # if already playing it doesn't start again...
@@ -481,15 +518,25 @@ class AudioDSPApp(tk.Tk):
                     break
 
     def generate_sinusoid(self):
-        try:
+        """
+        Generates a sinusoidal signal based on user-defined parameters such as frequency, amplitude, and phase.
+
+        The method retrieves input values from user interface fields, validates them, and calculates the sinusoidal
+        signal accordingly. It plots both the original and edited signals in the time and frequency domains.
+
+        :raises ValueError: If the input values cannot be converted to float.
+
+        :return: None
+        """
+        try:  # Checking if the input values are valid
             f = float(self.freq_entry.get())
             A = float(self.amp_entry.get())
             phi = float(self.phase_entry.get())
+            duration = float(self.dur_entry.get())
         except ValueError:
-            print("Valori non validi")
+            show_error("Invalid input value. Please enter valid numeric values.")
             return
 
-        duration = 2.0  # oppure un campo aggiuntivo per durata
         self.audio_signal = A * np.sin(2 * np.pi * f * np.arange(0, duration, 1 / self.fs) + phi)
         self.audio_signal_modified = self.audio_signal.copy()
 
@@ -568,28 +615,18 @@ class AudioDSPApp(tk.Tk):
         :return: None
         """
         if self.audio_signal is None:
-            print("No signal to equalize")
+            show_error("No signal loaded. Please load a signal first.")
             return
 
         processed_signal = self.audio_signal.copy()
 
         if self.equalizer_enabled.get():
-            processed_signal = equalize(
-                processed_signal,
-                self.low_gain.get(),
-                self.mid_gain.get(),
-                self.high_gain.get(),
-                self.fs
-            )
+            processed_signal = equalize(processed_signal, self.low_gain.get(), self.mid_gain.get(),
+                                        self.high_gain.get(), self.fs)
 
         if self.modulation_enabled.get():
-            processed_signal = modulate_signal(
-                processed_signal,
-                self.fs,
-                self.fc_slider.get(),
-                self.k_slider.get(),
-                self.mod_type_var.get()
-            )
+            processed_signal = modulate_signal(processed_signal, self.fs, self.fc_slider.get(), self.k_slider.get(),
+                                               self.mod_type_var.get())
         self.audio_signal_modified = processed_signal
 
         plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
