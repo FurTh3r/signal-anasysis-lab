@@ -17,37 +17,30 @@ def create_frequency_plot(X_mag: np.ndarray, f: np.ndarray) -> plt.Figure:
     return generate_2d_graph(f, X_mag, "Frequency [Hz]", "Magnitude", "Signal in Frequency Domain")
 
 
-def frequency_analysis(x, fs, only_positive=True, log_scale=False) -> tuple[np.ndarray, np.ndarray]:
+def frequency_analysis(x, fs, only_positive=True) -> tuple[np.ndarray, np.ndarray]:
     """
-    Performs frequency analysis on a given signal, computing its magnitude spectrum and
+    Performs frequency analysis on a given signal, computing its FFT and
     corresponding frequency components. Allows customization for returning only positive
-    frequencies and applying a logarithmic scale to the magnitude spectrum.
+    frequencies. Log scale is ignored if returning complex FFT.
 
     :param x: 1D input signal for which the frequency analysis is performed.
     :param fs: Sampling frequency of the input signal.
     :param only_positive: Optional boolean flag; if True, returns only positive frequency
         components. Defaults to True.
-    :param log_scale: Optional boolean flag; if True, applies a logarithmic scale to the
-        magnitude spectrum. Defaults to False.
     :return: A tuple containing two numpy arrays:
         - The frequency components (`np.ndarray`).
-        - The corresponding magnitude spectrum (`np.ndarray`).
+        - The FFT values (`np.ndarray`, complex).
     """
     N = len(x)
     X = np.fft.fft(x)
-    X_mag = np.abs(X) / N
-
     f = np.fft.fftfreq(N, d=1/fs)
 
     if only_positive:
         idx = f >= 0
         f = f[idx]
-        X_mag = X_mag[idx]
+        X = X[idx]
 
-    if log_scale:
-        X_mag = 20 * np.log10(X_mag + 1e-12)  # log(0) problem solved with +1e-12
-
-    return f, X_mag
+    return f, X
 
 def plot_fft_3d(x: np.ndarray, fs: int) -> plt.Figure:
     N = len(x)

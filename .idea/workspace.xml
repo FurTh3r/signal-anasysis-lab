@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI: Add signal generation controls, improved volume handling, and refactor log-scale frequency analysis logic">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -262,7 +264,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767184054941</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls">
+      <option name="closed" value="true" />
+      <created>1767188660540</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1767188660540</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -278,6 +288,7 @@
     <MESSAGE value="Enhance GUI: Add support for dual time-frequency plots and integrate logarithmic frequency scaling in analysis functions" />
     <MESSAGE value="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic" />
     <MESSAGE value="Enhance GUI: Add signal generation controls, improved volume handling, and refactor log-scale frequency analysis logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI: Add signal generation controls, improved volume handling, and refactor log-scale frequency analysis logic" />
+    <MESSAGE value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
   </component>
 </project>

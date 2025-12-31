@@ -3,13 +3,14 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 
 import matplotlib.pyplot as plt
+import messagebox
 import numpy as np
 import sounddevice as sd
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 from src.logic.IO import load_audio, save_audio
-from src.logic.analysis import frequency_analysis
-from src.logic.equalizer import equalize
+from src.logic.analysis import frequency_analysis, compute_energy_power
+from src.logic.equalizer import equalize, split_into_3bands
 from src.logic.modulation import modulate_signal
 
 # =========================
@@ -54,55 +55,64 @@ def _create_vertical_slider(parent, label, default):
     return slider
 
 
-def plot_time_signal(signal, fs, ax, canvas, title="Time domain signal"):
-    """
-    Plots the time-domain representation of a signal on a given Axes and Canvas.
-
-    :param signal: Array-like audio or generic signal
-    :param fs: Sampling frequency [Hz]
-    :param ax: Matplotlib Axes object where the signal will be plotted
-    :param canvas: FigureCanvasTkAgg object to draw the plot
-    :param title: Plot title (default: "Time domain signal")
-    """
-    if signal is None or ax is None or canvas is None:
+def plot_graph(x_values, y_values, x_name, y_name, ax, canvas, title="Signal Graph"):
+    if x_values is None or y_values is None or ax is None or canvas is None:
         return
 
     ax.clear()
-    t = np.arange(len(signal)) / fs
-    ax.set_xlim(0, t[-1])
-    ax.set_ylim(1.1 * np.min(signal), 1.1 * np.max(signal))
-    ax.plot(t, signal)
+    ax.set_xlim(0, x_values[-1])
+    ax.set_ylim(1.1 * np.min(y_values), 1.1 * np.max(y_values))
+    ax.plot(x_values, y_values)
     ax.set_title(title)
-    ax.set_xlabel("Time [s]")
-    ax.set_ylabel("Amplitude")
+    ax.set_xlabel(x_name)
+    ax.set_ylabel(y_name)
     ax.grid(True)
+
     canvas.draw_idle()
 
 
-def plot_frequency_signal(signal, fs, ax, canvas, title="Frequency spectrum"):
+def plot_3graph(x1, y1, x2, y2, x3, y3, ax, canvas, title="Signal Graph", xlabel="X-axis", ylabel="Y-axis",
+                labels=("Series 1", "Series 2", "Series 3")):
     """
-    Plots the frequency spectrum of a signal on a given Axes and Canvas.
+    Plots three signals with independent x-values on the same axis with legend and grid.
 
-    :param signal: Array-like audio or generic signal
-    :param fs: Sampling frequency [Hz]
-    :param ax: Matplotlib Axes object where the frequency spectrum will be plotted
-    :param canvas: FigureCanvasTkAgg object to draw the plot
-    :param title: Plot title (default: "Frequency spectrum")
+    :param x1, x2, x3: Arrays of x-axis values for each series
+    :param y1, y2, y3: Arrays of y-axis values for each series
+    :param ax: Matplotlib Axes object to plot on
+    :param canvas: Matplotlib canvas to refresh
+    :param title: Plot title
+    :param xlabel: X-axis label
+    :param ylabel: Y-axis label
+    :param labels: Tuple of labels for the three series
     """
-    if signal is None or ax is None or canvas is None:
+    if (
+            x1 is None or y1 is None or x2 is None or y2 is None or x3 is None or y3 is None or ax is None or canvas is None):
         return
 
     ax.clear()
-    f, X_mag = frequency_analysis(signal, fs, True, False)
 
-    print(fs)
+    # Determina limiti asse x
+    xmin = min(np.min(x1), np.min(x2), np.min(x3))
+    xmax = max(np.max(x1), np.max(x2), np.max(x3))
+    ax.set_xlim(xmin, xmax)
 
-    ax.set_xlim(0, fs / 2)
-    ax.plot(f, X_mag)
+    # Determina limiti asse y
+    ymin = min(np.min(y1), np.min(y2), np.min(y3))
+    ymax = max(np.max(y1), np.max(y2), np.max(y3))
+    ax.set_ylim(1.1 * ymin, 1.1 * ymax)
+
+    # Plot delle tre serie
+    ax.plot(x1, y1, label=labels[0])
+    ax.plot(x2, y2, label=labels[1])
+    ax.plot(x3, y3, label=labels[2])
+
+    # Titoli e label
     ax.set_title(title)
-    ax.set_xlabel("Frequency [Hz]")
-    ax.set_ylabel("|X(f)|")
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
     ax.grid(True)
+    ax.legend()
+
     canvas.draw_idle()
 
 
@@ -144,6 +154,11 @@ class AudioDSPApp(tk.Tk):
         Initializes the main application for the Audio DSP Toolkit.
         """
         super().__init__()
+
+        self.power_mod_var = None
+        self.power_orig_var = None
+        self.energy_mod_var = None
+        self.energy_orig_var = None
         self.title("Audio DSP Toolkit")
         self.configure(bg=BG_MAIN)
 
@@ -180,6 +195,18 @@ class AudioDSPApp(tk.Tk):
         self.phase_entry = None
         self.amp_entry = None
         self.freq_entry = None
+        self.graph_choice = None
+        self.logMagnitude = tk.BooleanVar(value=True)
+        self.freq_text = None
+        self.parseval_var = None
+        self.power_var = None
+        self.energy_var = None
+        self.canvas_autocorr = None
+        self.fig_autocorr = None
+        self.ax_spectro = None
+        self.canvas_spectro = None
+        self.ax_autocorr = None
+        self.fig_spectro = None
 
         # =========================
         # Style Settings
@@ -268,6 +295,23 @@ class AudioDSPApp(tk.Tk):
         self.loop_button = ttk.Button(bottom_frame, text="Loop OFF", command=self.loop_play_audio)
         self.loop_button.pack(side="left", padx=5)
 
+        # Graph selection buttons
+        button_frame = ttk.LabelFrame(self, text="Graph Selection")
+        button_frame.pack(padx=10, pady=10, fill="x")
+
+        self.graph_choice = tk.StringVar(value="magnitude")
+
+        # Radio buttons in orizzontale
+        ttk.Radiobutton(button_frame, text="FFT Phase", variable=self.graph_choice, value="phase",
+                        command=self.update_plot).pack(side="left", padx=5, pady=5)
+        ttk.Radiobutton(button_frame, text="FFT Module", variable=self.graph_choice, value="magnitude",
+                        command=self.update_plot).pack(side="left", padx=5, pady=5)
+        ttk.Radiobutton(button_frame, text="3 Bande (Low/Medium/High)", variable=self.graph_choice, value="3bands",
+                        command=self.update_plot).pack(side="left", padx=5, pady=5)
+
+        ttk.Checkbutton(button_frame, text="Enable Log Scale", variable=self.logMagnitude).pack(side="left", padx=10)
+
+        ttk.Button(button_frame, text="Reload Graphs", command=self.update_plot).pack(side="left", padx=5)
         # =======================
         # Generate Sinusoid
         # =======================
@@ -404,14 +448,183 @@ class AudioDSPApp(tk.Tk):
     # TAB 2 – Signal Analysis
     # =========================
     def create_signal_analysis_tab(self):
-        ttk.Label(self.tab_control_tab2, text="Analisi avanzata (DFT 3D, spettrogrammi, autocorrelazione)").pack(
-            pady=20)
+        ttk.Label(self.tab_control_tab2, text="Analisi avanzata (STFT, autocorrelazione, Parseval)",
+            font=("Segoe UI", 12, "bold")).pack(pady=10)
+
+        # =========================
+        # Graph Frame
+        # =========================
+        graphs_frame = ttk.Frame(self.tab_control_tab2)
+        graphs_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        graphs_frame.columnconfigure(0, weight=1)
+        graphs_frame.columnconfigure(1, weight=1)
+
+        # --- STFT spectrum
+        spectro_frame = ttk.LabelFrame(graphs_frame, text="Spettrogramma (STFT)")
+        spectro_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+
+        self.fig_spectro, self.ax_spectro = plt.subplots(figsize=(5, 3))
+        self.canvas_spectro = FigureCanvasTkAgg(self.fig_spectro, master=spectro_frame)
+        self.canvas_spectro.get_tk_widget().pack(fill="both", expand=True)
+
+        # --- Autocorrelation
+        autocorr_frame = ttk.LabelFrame(graphs_frame, text="Autocorrelazione")
+        autocorr_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+
+        self.fig_autocorr, self.ax_autocorr = plt.subplots(figsize=(5, 3))
+        self.canvas_autocorr = FigureCanvasTkAgg(self.fig_autocorr, master=autocorr_frame)
+        self.canvas_autocorr.get_tk_widget().pack(fill="both", expand=True)
+
+        # =========================
+        # Frame numeric analysis
+        # =========================
+        analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Analisi numerica del segnale")
+        analysis_frame.pack(fill="x", padx=10, pady=10)
+
+        analysis_frame.columnconfigure(1, weight=1)
+
+        # Energy & Power
+        # --- Energy (Original)
+        ttk.Label(analysis_frame, text="Original Signal Energy:").grid(row=0, column=0, sticky="w", padx=5)
+        self.energy_orig_var = tk.StringVar(value="—")
+        ttk.Label(analysis_frame, textvariable=self.energy_orig_var).grid(row=0, column=1, sticky="w")
+
+        # --- Energy (Modified)
+        ttk.Label(analysis_frame, text="Modified Signal Energy:").grid(row=1, column=0, sticky="w", padx=5)
+        self.energy_mod_var = tk.StringVar(value="—")
+        ttk.Label(analysis_frame, textvariable=self.energy_mod_var).grid(row=1, column=1, sticky="w")
+
+        # --- Power (Original)
+        ttk.Label(analysis_frame, text="Original Signal Power:").grid(row=2, column=0, sticky="w", padx=5)
+        self.power_orig_var = tk.StringVar(value="—")
+        ttk.Label(analysis_frame, textvariable=self.power_orig_var).grid(row=2, column=1, sticky="w")
+
+        # --- Power (Modified)
+        ttk.Label(analysis_frame, text="Modified Signal Power:").grid(row=3, column=0, sticky="w", padx=5)
+        self.power_mod_var = tk.StringVar(value="—")
+        ttk.Label(analysis_frame, textvariable=self.power_mod_var).grid(row=3, column=1, sticky="w")
+
+        # --- Parseval
+        ttk.Label(analysis_frame, text="Teorema di Parseval:").grid(row=2, column=0, sticky="w", padx=5)
+        self.parseval_var = tk.StringVar(value="—")
+        ttk.Label(analysis_frame, textvariable=self.parseval_var, font=("Segoe UI", 9, "bold")).grid(row=2, column=1,
+                                                                                                     sticky="w")
+
+        # =========================
+        # Dominant frequencies
+        # =========================
+        freq_frame = ttk.LabelFrame(self.tab_control_tab2, text="Frequenze dominanti (Top 10)")
+        freq_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        self.freq_text = tk.Text(freq_frame, height=6, width=60)
+        self.freq_text.pack(fill="both", expand=True, padx=5, pady=5)
+        self.freq_text.configure(state="disabled")
 
     # =========================
     # Audio GUI logic
     # =========================
+    def update_fields(self):
+        if self.audio_signal is None or self.audio_signal_modified is None:
+            return
 
-    def update_modulation_controls(self, *args): #TODO fix
+        # Calculating energy and power
+        energy_orig, power_orig = compute_energy_power(self.audio_signal)
+        energy_mod, power_mod = compute_energy_power(self.audio_signal_modified)
+
+        # Update the lables
+        self.energy_orig_var.set(f"{energy_orig:.3e}")
+        self.energy_mod_var.set(f"{energy_mod:.3e}")
+        self.power_orig_var.set(f"{power_orig:.3e}")
+        self.power_mod_var.set(f"{power_mod:.3e}")
+
+    def update_plot(self):
+        if self.audio_signal_modified is None:
+            return
+
+        choice = self.graph_choice.get()
+
+        # Clear Graphs
+        self.ax_freq.clear()
+        self.ax_time.clear()
+        self.ax_freq2.clear()
+        self.ax_time2.clear()
+
+        # Updating time graphs
+        t = np.arange(len(self.audio_signal)) / self.fs
+        plot_graph(t, self.audio_signal, "Time [s]", "Amplitude", self.ax_time, self.canvas_time, "Original Signal")
+
+        t_edited = np.arange(len(self.audio_signal_modified)) / self.fs
+        plot_graph(t_edited, self.audio_signal_modified, "Time [s]", "Amplitude", self.ax_time2, self.canvas_time2,
+                   "Modified Signal")
+
+        if choice == "magnitude":
+            # Original Signal
+            f, X = frequency_analysis(self.audio_signal, self.fs)
+            if self.logMagnitude.get():
+                X_mag = 20 * np.log10(np.abs(X) + 1e-12)
+            else:
+                X_mag = np.abs(X)
+            plot_graph(f, X_mag, "Frequency (Hz)", "|X(f)|", self.ax_freq, self.canvas_freq, "FFT Magnitude")
+
+            # Edited Signal
+            f_edited, X_edited = frequency_analysis(self.audio_signal_modified, self.fs)
+            if self.logMagnitude.get():
+                X_mag_edited = 20 * np.log10(np.abs(X_edited) + 1e-12)
+            else:
+                X_mag_edited = np.abs(X_edited)
+            plot_graph(f_edited, X_mag_edited, "Frequency (Hz)", "|X(f)|", self.ax_freq2, self.canvas_freq2,
+                       "FFT Magnitude")
+
+        elif choice == "phase":
+            # Original Signal
+            f, X = frequency_analysis(self.audio_signal, self.fs)
+            plot_graph(f, np.angle(X), "Frequency (Hz)", "Phase (rad)", self.ax_freq, self.canvas_freq, "FFT Phase")
+
+            # Edited Signal
+            f_edited, X_edited = frequency_analysis(self.audio_signal_modified, self.fs)
+            plot_graph(f_edited, np.angle(X_edited), "Frequency (Hz)", "Phase (rad)", self.ax_freq2, self.canvas_freq2,
+                       "FFT Phase")
+
+        elif choice == "3bands":
+            # Original Signal
+            x_low, x_mid, x_high = split_into_3bands(self.audio_signal, self.fs)
+            f_l, X_l = frequency_analysis(x_low, self.fs)
+            f_m, X_m = frequency_analysis(x_mid, self.fs)
+            f_h, X_h = frequency_analysis(x_high, self.fs)
+
+            # Conditionally computes log magnitude for low, mid, high bands
+            if self.logMagnitude.get():
+                X_l_mag = 20 * np.log10(np.abs(X_l) + 1e-12)
+                X_m_mag = 20 * np.log10(np.abs(X_m) + 1e-12)
+                X_h_mag = 20 * np.log10(np.abs(X_h) + 1e-12)
+            else:
+                X_l_mag = np.abs(X_l)
+                X_m_mag = np.abs(X_m)
+                X_h_mag = np.abs(X_h)
+            plot_3graph(f_l, X_l_mag, f_m, X_m_mag, f_h, X_h_mag, self.ax_freq, self.canvas_freq,
+                        "Original Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
+
+            # Edited Signal
+            x_low_edited, x_mid_edited, x_high_edited = split_into_3bands(self.audio_signal_modified, self.fs)
+            f_l_edited, X_l_edited = frequency_analysis(x_low_edited, self.fs)
+            f_m_edited, X_m_edited = frequency_analysis(x_mid_edited, self.fs)
+            f_h_edited, X_h_edited = frequency_analysis(x_high_edited, self.fs)
+
+            # Computes magnitude of edited signal bands; logarithmic if enabled
+            if self.logMagnitude.get():
+                X_l_mag_edited = 20 * np.log10(np.abs(X_l_edited) + 1e-12)
+                X_m_mag_edited = 20 * np.log10(np.abs(X_m_edited) + 1e-12)
+                X_h_mag_edited = 20 * np.log10(np.abs(X_h_edited) + 1e-12)
+            else:
+                X_l_mag_edited = np.abs(X_l_edited)
+                X_m_mag_edited = np.abs(X_m_edited)
+                X_h_mag_edited = np.abs(X_h_edited)
+
+            plot_3graph(f_l_edited, X_l_mag_edited, f_m_edited, X_m_mag_edited, f_h_edited, X_h_mag_edited,
+                        self.ax_freq2, self.canvas_freq2, "Modified Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
+
+    def update_modulation_controls(self, *args):  # TODO fix
         mod_type = self.mod_type_var.get()
 
         if not self.modulation_enabled.get():
@@ -450,14 +663,9 @@ class AudioDSPApp(tk.Tk):
             self.audio_signal, self.fs = load_audio(path)
             self.audio_signal_modified = self.audio_signal.copy()
 
-        # Original Audio Graphs
-        plot_time_signal(self.audio_signal, self.fs, self.ax_time, self.canvas_time, "Original Time Graph")
-        plot_frequency_signal(self.audio_signal, self.fs, self.ax_freq, self.canvas_freq, "Original Frenquency Graph")
-
-        # Edited Audio Graphs
-        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
-        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
-                              "Edited Frequency Graph")
+        # Update plots
+        self.update_plot()
+        self.update_fields()
 
     def play_audio(self):
         """
@@ -540,14 +748,8 @@ class AudioDSPApp(tk.Tk):
         self.audio_signal = A * np.sin(2 * np.pi * f * np.arange(0, duration, 1 / self.fs) + phi)
         self.audio_signal_modified = self.audio_signal.copy()
 
-        # Original Audio Graphs
-        plot_time_signal(self.audio_signal, self.fs, self.ax_time, self.canvas_time, "Original Time Graph")
-        plot_frequency_signal(self.audio_signal, self.fs, self.ax_freq, self.canvas_freq, "Original Frenquency Graph")
-
-        # Edited Audio Graphs
-        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
-        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
-                              "Edited Frequency Graph")
+        # Update plots
+        self.update_plot()
 
     def stop_audio(self):
         """
@@ -629,9 +831,9 @@ class AudioDSPApp(tk.Tk):
                                                self.mod_type_var.get())
         self.audio_signal_modified = processed_signal
 
-        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
-        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
-                              "Edited Frequency Graph")
+        # Update plots
+        self.update_plot()
+        self.update_fields()
 
     def on_volume_change(self, v):
         """

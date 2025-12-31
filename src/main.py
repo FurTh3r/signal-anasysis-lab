@@ -21,11 +21,11 @@ def pipeline_test():
     plot_graph(plot_fft_3d(x, fs))
 
     # Plot frequency domain
-    f, X_mag = frequency_analysis(x, fs)
-    plot_graph(create_frequency_plot(X_mag, f))
+    f, X = frequency_analysis(x, fs)
+    plot_graph(create_frequency_plot(np.abs(X), f))
 
     # Show dominant frequency
-    print(get_dominant_frequencies(f, X_mag, 10))
+    print(get_dominant_frequencies(f, np.abs(X), 10))
 
     # Calculating power and energy and verifying Parseval Theorem
     energy, power = compute_energy_power(x)
@@ -41,7 +41,7 @@ def pipeline_test():
     f_l, X_l = frequency_analysis(x_low, fs)
     f_m, X_m = frequency_analysis(x_mid, fs)
     f_h, X_h = frequency_analysis(x_high, fs)
-    plot_bands_frequency(f_l, X_l, f_m, X_m, f_h, X_h, fs)
+    plot_bands_frequency(f_l, np.abs(X_l), f_m, np.abs(X_m), f_h, np.abs(X_h), fs)
 
     equalized_signal = equalize(x, 0.8, 1.2, 1.5, fs)
 
