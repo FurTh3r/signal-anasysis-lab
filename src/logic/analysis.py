@@ -37,15 +37,15 @@ def frequency_analysis(x, fs, only_positive=True, log_scale=False) -> tuple[np.n
     X = np.fft.fft(x)
     X_mag = np.abs(X) / N
 
-    if log_scale:
-        X_mag = 20 * np.log10(X_mag + 1e-12)  # log(0) problem solved with +1e-12
-
     f = np.fft.fftfreq(N, d=1/fs)
 
     if only_positive:
         idx = f >= 0
         f = f[idx]
         X_mag = X_mag[idx]
+
+    if log_scale:
+        X_mag = 20 * np.log10(X_mag + 1e-12)  # log(0) problem solved with +1e-12
 
     return f, X_mag
 

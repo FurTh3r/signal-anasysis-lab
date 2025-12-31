@@ -93,7 +93,9 @@ def plot_frequency_signal(signal, fs, ax, canvas, title="Frequency spectrum"):
         return
 
     ax.clear()
-    f, X_mag = frequency_analysis(signal, fs, True, True)
+    f, X_mag = frequency_analysis(signal, fs, True, False)
+
+    print(fs)
 
     ax.set_xlim(0, fs / 2)
     ax.plot(f, X_mag)
@@ -104,9 +106,24 @@ def plot_frequency_signal(signal, fs, ax, canvas, title="Frequency spectrum"):
     canvas.draw_idle()
 
 
+def generate_sinusoid(frequency, amplitude, phase, duration, fs):
+    """
+    Generates a sinusoidal signal.
+
+    :param frequency: Frequency of the sinusoid in Hz
+    :param amplitude: Amplitude of the sinusoid
+    :param phase: Phase of the sinusoid in radians
+    :param duration: Duration of the signal in seconds
+    :param fs: Sampling frequency in Hz
+    :return: numpy array containing the sinusoidal signal
+    """
+    t = np.arange(0, duration, 1 / fs)
+    signal = amplitude * np.sin(2 * np.pi * frequency * t + phase)
+    return signal, t
+
 class AudioDSPApp(tk.Tk):
     """
-    Main application class for a graphical user interface (GUI) toolkit designed for audio DSP (Digital Signal Processing).
+    The main application class for a graphical user interface (GUI) toolkit designed for audio DSP (Digital Signal Processing).
     This class inherits from `tk.Tk` and serves as the entry point for creating and managing the GUI components, including
     audio control and signal analysis features.
     """
@@ -117,6 +134,9 @@ class AudioDSPApp(tk.Tk):
         """
         super().__init__()
 
+        self.phase_entry = None
+        self.amp_entry = None
+        self.freq_entry = None
         self.title("Audio DSP Toolkit")
         self.configure(bg=BG_MAIN)
 
@@ -237,6 +257,39 @@ class AudioDSPApp(tk.Tk):
         self.loop_button = ttk.Button(bottom_frame, text="Loop OFF", command=self.loop_play_audio)
         self.loop_button.pack(side="left", padx=5)
 
+        # =======================
+        # Generate Sinusoid
+        # =======================
+        frame_generate = ttk.Labelframe(left_frame, text="Generate Signal")
+        frame_generate.pack(fill="x", pady=10)
+
+        # Frequency
+        freq_frame = ttk.Frame(frame_generate)
+        freq_frame.pack(fill="x", pady=2)
+        ttk.Label(freq_frame, text="Frequency [Hz]").pack(side="left")
+        self.freq_entry = ttk.Entry(freq_frame, width=10)
+        self.freq_entry.insert(0, "1000")  # valore di default
+        self.freq_entry.pack(side="left", padx=5)
+
+        # Amplitude
+        amp_frame = ttk.Frame(frame_generate)
+        amp_frame.pack(fill="x", pady=2)
+        ttk.Label(amp_frame, text="Amplitude").pack(side="left")
+        self.amp_entry = ttk.Entry(amp_frame, width=10)
+        self.amp_entry.insert(0, "1.0")  # valore di default
+        self.amp_entry.pack(side="left", padx=5)
+
+        # Phase
+        phase_frame = ttk.Frame(frame_generate)
+        phase_frame.pack(fill="x", pady=2)
+        ttk.Label(phase_frame, text="Phase [rad]").pack(side="left")
+        self.phase_entry = ttk.Entry(phase_frame, width=10)
+        self.phase_entry.insert(0, "0.0")  # valore di default
+        self.phase_entry.pack(side="left", padx=5)
+
+        # Pulsante Generate
+        ttk.Button(frame_generate, text="Generate", command=self.generate_sinusoid).pack(pady=5)
+
         # Volume
         vol_frame = ttk.Frame(frame_io)
         vol_frame.pack(side="left", padx=15)
@@ -244,8 +297,15 @@ class AudioDSPApp(tk.Tk):
         self.volume_value_label = ttk.Label(vol_frame, text="1.00")
         self.volume_value_label.pack()
 
-        self.volume_slider = tk.Scale(vol_frame, from_=1.0, to=0.0, resolution=0.01, orient="vertical", length=120,
-                                      command=lambda v: self.volume_value_label.config(text=f"{float(v):.2f}"))
+        self.volume_slider = tk.Scale(
+            vol_frame,
+            from_=1.0,
+            to=0.0,
+            resolution=0.01,
+            orient="vertical",
+            length=120,
+            command=self.on_volume_change  # callback
+        )
         self.volume_slider.set(1.0)
         self.volume_slider.pack()
 
@@ -420,6 +480,28 @@ class AudioDSPApp(tk.Tk):
                 if not self.loop_enabled:
                     break
 
+    def generate_sinusoid(self):
+        try:
+            f = float(self.freq_entry.get())
+            A = float(self.amp_entry.get())
+            phi = float(self.phase_entry.get())
+        except ValueError:
+            print("Valori non validi")
+            return
+
+        duration = 2.0  # oppure un campo aggiuntivo per durata
+        self.audio_signal = A * np.sin(2 * np.pi * f * np.arange(0, duration, 1 / self.fs) + phi)
+        self.audio_signal_modified = self.audio_signal.copy()
+
+        # Original Audio Graphs
+        plot_time_signal(self.audio_signal, self.fs, self.ax_time, self.canvas_time, "Original Time Graph")
+        plot_frequency_signal(self.audio_signal, self.fs, self.ax_freq, self.canvas_freq, "Original Frenquency Graph")
+
+        # Edited Audio Graphs
+        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
+        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
+                              "Edited Frequency Graph")
+
     def stop_audio(self):
         """
         Stops the audio playback by setting the stop event.
@@ -471,6 +553,20 @@ class AudioDSPApp(tk.Tk):
         pass
 
     def apply_processing(self):
+        """
+        Process the audio signal with user-defined equalization and modulation settings, update the modified audio
+        signal, and plot the results in both time and frequency domains.
+
+        The method first ensures there is an available audio signal that can be processed. If equalization or
+        modulation is enabled, it applies those processing steps using the parameters set by the user. Finally,
+        the processed signal replaces the original modified signal, and the results are visualized in the
+        corresponding time and frequency domain plots.
+
+        :param self: The instance of the class calling this method.
+
+        :raises ValueError: If the given input parameters or configurations are invalid.
+        :return: None
+        """
         if self.audio_signal is None:
             print("No signal to equalize")
             return
@@ -499,3 +595,19 @@ class AudioDSPApp(tk.Tk):
         plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
         plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
                               "Edited Frequency Graph")
+
+    def on_volume_change(self, v):
+        """
+        Handles volume change event by updating the label text to display the new volume
+        value, formatted to two decimal places. If the input value cannot be converted
+        to a float, the method safely exits without updating.
+
+        :param v: The new volume value as a string. The method attempts to convert this
+            value to a float.
+        :return: None
+        """
+        try:
+            v_float = float(v)
+        except ValueError:
+            return
+        self.volume_value_label.config(text=f"{v_float:.2f}")

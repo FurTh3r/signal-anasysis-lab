@@ -4,7 +4,7 @@ from src.logic.IO import load_audio, to_mono
 from src.logic.analysis import frequency_analysis, create_time_plot, create_frequency_plot, get_dominant_frequencies, \
     compute_energy_power, check_Parseval_theorem, spectrogram_analysis, plot_fft_3d, autocorrelation_plot
 
-from src.logic.equalizer import split_into_bands, equalize
+from src.logic.equalizer import split_into_3bands, equalize
 from src.logic.modulation import modulate_signal
 from src.logic.utils import plot_graph, plot_two_graphs_side_by_side, plot_bands_time, plot_bands_frequency
 
@@ -36,7 +36,7 @@ def pipeline_test():
     plot_graph(autocorrelation_plot(x))
 
     # Splitting signal in bands
-    x_low, x_mid, x_high = split_into_bands(x, fs)
+    x_low, x_mid, x_high = split_into_3bands(x, fs)
     plot_bands_time(x_low, x_mid, x_high, fs)
     f_l, X_l = frequency_analysis(x_low, fs)
     f_m, X_m = frequency_analysis(x_mid, fs)
@@ -69,7 +69,7 @@ def pipeline_test():
     # Saving/Reproducing signal
 
 def main():
-    # pipeline_test()
+    #pipeline_test()
     from src.gui.gui import AudioDSPApp
     app = AudioDSPApp()
     app.mainloop()

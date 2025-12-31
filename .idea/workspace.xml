@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,21 +53,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.analysis.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/loryp/PycharmProjects/PythonProject/data&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Main.executor": "Run",
+    "Python.analysis.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.utils.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/loryp/PycharmProjects/PythonProject/data"
   }
-}</component>
+}]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1769166017551" />
     <option name="spentUsd" value="0.104598634" />
@@ -238,7 +240,23 @@
       <option name="project" value="LOCAL" />
       <updated>1767176006868</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Enhance GUI: Add support for dual time-frequency plots and integrate logarithmic frequency scaling in analysis functions">
+      <option name="closed" value="true" />
+      <created>1767178551068</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1767178551068</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic">
+      <option name="closed" value="true" />
+      <created>1767179050303</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1767179050303</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -251,6 +269,8 @@
     <MESSAGE value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
     <MESSAGE value="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features" />
     <MESSAGE value="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls" />
+    <MESSAGE value="Enhance GUI: Add support for dual time-frequency plots and integrate logarithmic frequency scaling in analysis functions" />
+    <MESSAGE value="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic" />
   </component>
 </project>
