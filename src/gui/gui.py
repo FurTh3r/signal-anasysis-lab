@@ -7,7 +7,8 @@ import numpy as np
 import sounddevice as sd
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
-from src.logic.IO import load_audio, record_audio, save_audio
+from src.logic.IO import load_audio, save_audio
+from src.logic.analysis import frequency_analysis
 from src.logic.equalizer import equalize
 from src.logic.modulation import modulate_signal
 
@@ -53,6 +54,56 @@ def _create_vertical_slider(parent, label, default):
     return slider
 
 
+def plot_time_signal(signal, fs, ax, canvas, title="Time domain signal"):
+    """
+    Plots the time-domain representation of a signal on a given Axes and Canvas.
+
+    :param signal: Array-like audio or generic signal
+    :param fs: Sampling frequency [Hz]
+    :param ax: Matplotlib Axes object where the signal will be plotted
+    :param canvas: FigureCanvasTkAgg object to draw the plot
+    :param title: Plot title (default: "Time domain signal")
+    """
+    if signal is None or ax is None or canvas is None:
+        return
+
+    ax.clear()
+    t = np.arange(len(signal)) / fs
+    ax.set_xlim(0, t[-1])
+    ax.set_ylim(1.1 * np.min(signal), 1.1 * np.max(signal))
+    ax.plot(t, signal)
+    ax.set_title(title)
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Amplitude")
+    ax.grid(True)
+    canvas.draw_idle()
+
+
+def plot_frequency_signal(signal, fs, ax, canvas, title="Frequency spectrum"):
+    """
+    Plots the frequency spectrum of a signal on a given Axes and Canvas.
+
+    :param signal: Array-like audio or generic signal
+    :param fs: Sampling frequency [Hz]
+    :param ax: Matplotlib Axes object where the frequency spectrum will be plotted
+    :param canvas: FigureCanvasTkAgg object to draw the plot
+    :param title: Plot title (default: "Frequency spectrum")
+    """
+    if signal is None or ax is None or canvas is None:
+        return
+
+    ax.clear()
+    f, X_mag = frequency_analysis(signal, fs, True, True)
+
+    ax.set_xlim(0, fs / 2)
+    ax.plot(f, X_mag)
+    ax.set_title(title)
+    ax.set_xlabel("Frequency [Hz]")
+    ax.set_ylabel("|X(f)|")
+    ax.grid(True)
+    canvas.draw_idle()
+
+
 class AudioDSPApp(tk.Tk):
     """
     Main application class for a graphical user interface (GUI) toolkit designed for audio DSP (Digital Signal Processing).
@@ -67,7 +118,6 @@ class AudioDSPApp(tk.Tk):
         super().__init__()
 
         self.title("Audio DSP Toolkit")
-        self.geometry("1200x800")
         self.configure(bg=BG_MAIN)
 
         # Component Variables:
@@ -93,6 +143,12 @@ class AudioDSPApp(tk.Tk):
         self.ax_time = None
         self.ax_freq = None
         self.frame_graphs = None
+        self.canvas_freq2 = None
+        self.ax_freq2 = None
+        self.fig_freq2 = None
+        self.canvas_time2 = None
+        self.ax_time2 = None
+        self.fig_time2 = None
 
         # =========================
         # Style Settings
@@ -138,7 +194,7 @@ class AudioDSPApp(tk.Tk):
     # =========================
     def create_audio_control_tab(self):
         # =======================
-        # Layout principale
+        # Main Layout
         # =======================
         main_frame = ttk.Frame(self.tab_control_tab1)
         main_frame.pack(expand=True, fill="both", padx=10, pady=10)
@@ -153,6 +209,10 @@ class AudioDSPApp(tk.Tk):
         graphs_frame.pack(expand=True, fill="both")
 
         graphs_frame.columnconfigure(0, weight=1)
+        graphs_frame.rowconfigure(0, weight=1)
+        graphs_frame.rowconfigure(2, weight=1)
+
+        graphs_frame.columnconfigure(1, weight=1)
         graphs_frame.rowconfigure(0, weight=1)
         graphs_frame.rowconfigure(2, weight=1)
 
@@ -224,10 +284,9 @@ class AudioDSPApp(tk.Tk):
         # Apply Processing
         ttk.Button(left_frame, text="Apply Processing", command=self.apply_processing).pack(pady=10)
 
-        # ===== TIME GRAPH =====
+        # ===== TIME GRAPH ORIGINAL =====
         self.fig_time = plt.Figure(figsize=(4, 3))
         self.ax_time = self.fig_time.add_subplot(111)
-
         self.canvas_time = FigureCanvasTkAgg(self.fig_time, master=graphs_frame)
         self.canvas_time.get_tk_widget().grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
@@ -235,16 +294,35 @@ class AudioDSPApp(tk.Tk):
         toolbar_time.update()
         toolbar_time.grid(row=1, column=0, sticky="w")
 
-        # ===== FREQUENCY GRAPH =====
+        # ===== FREQUENCY GRAPH ORIGINAL =====
         self.fig_freq = plt.Figure(figsize=(4, 3))
         self.ax_freq = self.fig_freq.add_subplot(111)
-
         self.canvas_freq = FigureCanvasTkAgg(self.fig_freq, master=graphs_frame)
         self.canvas_freq.get_tk_widget().grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         toolbar_freq = NavigationToolbar2Tk(self.canvas_freq, graphs_frame, pack_toolbar=False)
         toolbar_freq.update()
         toolbar_freq.grid(row=3, column=0, sticky="w")
+
+        # ===== TIME GRAPH EDITED =====
+        self.fig_time2 = plt.Figure(figsize=(4, 3))
+        self.ax_time2 = self.fig_time2.add_subplot(111)
+        self.canvas_time2 = FigureCanvasTkAgg(self.fig_time2, master=graphs_frame)
+        self.canvas_time2.get_tk_widget().grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
+
+        toolbar_time2 = NavigationToolbar2Tk(self.canvas_time2, graphs_frame, pack_toolbar=False)
+        toolbar_time2.update()
+        toolbar_time2.grid(row=1, column=1, sticky="w")
+
+        # ===== FREQUENCY GRAPH EDITED =====
+        self.fig_freq2 = plt.Figure(figsize=(4, 3))
+        self.ax_freq2 = self.fig_freq2.add_subplot(111)
+        self.canvas_freq2 = FigureCanvasTkAgg(self.fig_freq2, master=graphs_frame)
+        self.canvas_freq2.get_tk_widget().grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
+
+        toolbar_freq2 = NavigationToolbar2Tk(self.canvas_freq2, graphs_frame, pack_toolbar=False)
+        toolbar_freq2.update()
+        toolbar_freq2.grid(row=3, column=1, sticky="w")
 
     # =========================
     # TAB 2 – Signal Analysis
@@ -274,6 +352,15 @@ class AudioDSPApp(tk.Tk):
         if path:
             self.audio_signal, self.fs = load_audio(path)
             self.audio_signal_modified = self.audio_signal.copy()
+
+        # Original Audio Graphs
+        plot_time_signal(self.audio_signal, self.fs, self.ax_time, self.canvas_time, "Original Time Graph")
+        plot_frequency_signal(self.audio_signal, self.fs, self.ax_freq, self.canvas_freq, "Original Frenquency Graph")
+
+        # Edited Audio Graphs
+        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
+        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
+                              "Edited Frequency Graph")
 
     def play_audio(self):
         """
@@ -318,10 +405,8 @@ class AudioDSPApp(tk.Tk):
         N = len(x)
 
         with sd.OutputStream(samplerate=fs, channels=1, dtype='float32') as stream:
-
             while not self.stop_event.is_set():
                 i = 0
-
                 # Streams clipped audio blocks until end or stop
                 while i < N and not self.stop_event.is_set():
                     block = x[i:i + block_size] * self.volume_slider.get()
@@ -367,7 +452,7 @@ class AudioDSPApp(tk.Tk):
         the save operation or does not choose a file path, the method exits without saving.
 
         :raises FileNotFoundError: If the file path is invalid or inaccessible.
-        :raises PermissionError: If there is insufficient permission to write to the selected file path.
+        :raises PermissionError: If there is not enough permission to write to the selected file path.
 
         :return: None
         """
@@ -376,7 +461,7 @@ class AudioDSPApp(tk.Tk):
         if not path:
             return
 
-        # Save the editedAudio
+        # Save the edited audio
         save_audio(path, self.audio_signal_modified, self.fs)
 
     def save_params(self):
@@ -386,75 +471,31 @@ class AudioDSPApp(tk.Tk):
         pass
 
     def apply_processing(self):
-        if self.audio_signal_modified is None:
+        if self.audio_signal is None:
             print("No signal to equalize")
             return
 
-        equalized_signal = self.audio_signal_modified.copy()
+        processed_signal = self.audio_signal.copy()
+
         if self.equalizer_enabled.get():
-            equalized_signal = equalize(self.audio_signal, self.low_gain.get(), self.mid_gain.get(),
-                                        self.high_gain.get(), self.fs)
+            processed_signal = equalize(
+                processed_signal,
+                self.low_gain.get(),
+                self.mid_gain.get(),
+                self.high_gain.get(),
+                self.fs
+            )
 
         if self.modulation_enabled.get():
-            self.audio_signal_modified = modulate_signal(equalized_signal, self.fs, self.fc_slider.get(),
-                                                         self.k_slider.get(), self.mod_type_var.get())
+            processed_signal = modulate_signal(
+                processed_signal,
+                self.fs,
+                self.fc_slider.get(),
+                self.k_slider.get(),
+                self.mod_type_var.get()
+            )
+        self.audio_signal_modified = processed_signal
 
-        self.plot_time()
-        self.plot_frequency()
-
-    def plot_time(self):
-        """
-        Plots the time-domain representation of the modified audio signal.
-
-        This method visualizes the audio signal in the time domain using the assigned
-        axes object. It clears any previous content in the axes, computes the time
-        vector based on the sampling frequency, and updates the plot with the new data.
-        The method also customizes the plot's appearance, including setting labels,
-        grid, and title.
-
-        :return: None
-        """
-        if self.audio_signal_modified is None or self.ax_time is None:
-            return
-
-        self.ax_time.clear()
-        t = np.arange(len(self.audio_signal_modified)) / self.fs
-        self.ax_time.set_xlim(0, t[-1])
-        self.ax_time.set_ylim(1.1 * np.min(self.audio_signal_modified), 1.1 * np.max(self.audio_signal_modified))
-        self.ax_time.plot(t, self.audio_signal_modified)
-        self.ax_time.set_title("Segnale nel tempo")
-        self.ax_time.set_xlabel("Tempo [s]")
-        self.ax_time.set_ylabel("Ampiezza")
-        self.ax_time.grid(True)
-        self.canvas_time.draw_idle()
-
-    def plot_frequency(self):
-        """
-        Plots the frequency spectrum of a modified audio signal.
-
-        This method calculates and plots the frequency components of the modified audio
-        signal. It uses the Fast Fourier Transform (FFT) to compute the frequency
-        spectrum and plots it on the corresponding subplot axis. The x-axis represents
-        the frequency in Hertz, while the y-axis represents the magnitude of the
-        frequency components. The method updates the plot dynamically if the canvas is
-        available.
-
-        :raises ValueError: If either the `audio_signal_modified` or `ax_freq` attribute
-            is not set, the method will not proceed and will return without producing
-            any plot.
-
-        :return: None
-        """
-        if self.audio_signal_modified is None or self.ax_freq is None:
-            return
-
-        self.ax_freq.clear()
-        X = np.fft.rfft(self.audio_signal_modified)
-        f = np.fft.rfftfreq(len(self.audio_signal_modified), 1 / self.fs)
-        self.ax_freq.set_xlim(0, self.fs / 2)
-        self.ax_freq.plot(f, np.abs(X))
-        self.ax_freq.set_title("Spettro in frequenza")
-        self.ax_freq.set_xlabel("Frequenza [Hz]")
-        self.ax_freq.set_ylabel("|X(f)|")
-        self.ax_freq.grid(True)
-        self.canvas_freq.draw_idle()
+        plot_time_signal(self.audio_signal_modified, self.fs, self.ax_time2, self.canvas_time2, "Edited Time Graph")
+        plot_frequency_signal(self.audio_signal_modified, self.fs, self.ax_freq2, self.canvas_freq2,
+                              "Edited Frequency Graph")

@@ -1,35 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AIDiffSettings">
-    <option name="showAIDiff" value="true" />
-  </component>
-  <component name="AIDiffStorage" id="1">
-    <groups>
-      <group changeListId="f86a03c6-678b-4012-ab6d-6fe7627818db" id="1" name="Update 'workspace.xml' with new GUI commit message and task counter" description="Updates the IDE's workspace configuration to reflect a new commit message and increment the local task counter." importance="0.6">
-        <files>
-          <file summary="Updates the `.idea/workspace.xml` file to include a new commit message for GUI implementation and increments the 'localTasksCounter' from 8 to 9, reflecting recent version control activity." importance="0.6" isPending="false">
-            <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-            <ranges>
-              <range afterLine1="6" afterLine2="7" beforeLine1="6" beforeLine2="11" groupId="1" />
-              <range afterLine1="207" afterLine2="216" beforeLine1="211" beforeLine2="212" groupId="1" />
-              <range afterLine1="226" afterLine2="228" beforeLine1="222" beforeLine2="223" groupId="1" />
-            </ranges>
-          </file>
-        </files>
-      </group>
-    </groups>
-  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features">
-      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-    </list>
-    <list id="f86a03c6-678b-4012-ab6d-6fe7627818db" name="Update 'workspace.xml' with new GUI commit message and task counter" comment="Updates the IDE's workspace configuration to reflect a new commit message and increment the local task counter.">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -252,7 +230,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766596860930</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls">
+      <option name="closed" value="true" />
+      <created>1767176006868</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1767176006868</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -264,6 +250,7 @@
     <MESSAGE value="Update project configuration files to exclude `.venv` and set Python SDK to 3.13" />
     <MESSAGE value="Refactor: Restructure project by organizing source files into a `logic` directory and add advanced signal analysis functions" />
     <MESSAGE value="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add GUI: Implement interactive audio DSP toolkit with playback, equalizer, modulation, and signal analysis features" />
+    <MESSAGE value="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI: Add dynamic sliders for equalizer and modular UI improvements for audio processing controls" />
   </component>
 </project>
