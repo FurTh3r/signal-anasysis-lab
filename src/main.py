@@ -2,7 +2,7 @@ import numpy as np
 
 from src.logic.IO import load_audio, to_mono
 from src.logic.analysis import frequency_analysis, create_time_plot, create_frequency_plot, get_dominant_frequencies, \
-    compute_energy_power, check_Parseval_theorem, spectrogram_analysis, plot_fft_3d, autocorrelation_plot
+    compute_energy_power, check_parseval_theorem, spectrogram_analysis, plot_fft_3d, autocorrelation_plot
 
 from src.logic.equalizer import split_into_3bands, equalize
 from src.logic.modulation import modulate_signal
@@ -30,7 +30,7 @@ def pipeline_test():
     # Calculating power and energy and verifying Parseval Theorem
     energy, power = compute_energy_power(x)
     print(energy, power)
-    print(check_Parseval_theorem(x, np.fft.fft(x)))
+    print(check_parseval_theorem(x, np.fft.fft(x)))
 
     # Autocorrelation Calculation
     plot_graph(autocorrelation_plot(x))

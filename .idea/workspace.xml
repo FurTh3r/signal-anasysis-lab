@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/filters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/gui.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -272,7 +276,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767188660540</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling">
+      <option name="closed" value="true" />
+      <created>1767198384575</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1767198384575</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -289,6 +301,7 @@
     <MESSAGE value="Refactor: Improve FIR filter and equalizer functions with enhanced docstrings, parameter validation, and optimized band-splitting logic" />
     <MESSAGE value="Enhance GUI: Add signal generation controls, improved volume handling, and refactor log-scale frequency analysis logic" />
     <MESSAGE value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
+    <MESSAGE value="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling" />
   </component>
 </project>

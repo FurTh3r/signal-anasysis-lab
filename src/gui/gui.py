@@ -9,7 +9,8 @@ import sounddevice as sd
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 from src.logic.IO import load_audio, save_audio
-from src.logic.analysis import frequency_analysis, compute_energy_power
+from src.logic.analysis import frequency_analysis, compute_energy_power, get_dominant_frequencies, spectrogram_analysis, \
+    autocorrelation
 from src.logic.equalizer import equalize, split_into_3bands
 from src.logic.modulation import modulate_signal
 
@@ -155,14 +156,12 @@ class AudioDSPApp(tk.Tk):
         """
         super().__init__()
 
-        self.power_mod_var = None
-        self.power_orig_var = None
-        self.energy_mod_var = None
-        self.energy_orig_var = None
         self.title("Audio DSP Toolkit")
         self.configure(bg=BG_MAIN)
 
         # Component Variables:
+        self.n_max = 10  # Number of top frequencies to show
+
         self.volume_value_label = None
         self.loop_button = None
         self.volume_slider = None
@@ -207,6 +206,14 @@ class AudioDSPApp(tk.Tk):
         self.canvas_spectro = None
         self.ax_autocorr = None
         self.fig_spectro = None
+        self.top_freqs_mod_var = None
+        self.power_mod_var = None
+        self.power_orig_var = None
+        self.energy_mod_var = None
+        self.energy_orig_var = None
+        self.top_freqs_orig_var = None
+        self.freq_text_orig = None
+        self.freq_text_mod = None
 
         # =========================
         # Style Settings
@@ -449,7 +456,7 @@ class AudioDSPApp(tk.Tk):
     # =========================
     def create_signal_analysis_tab(self):
         ttk.Label(self.tab_control_tab2, text="Analisi avanzata (STFT, autocorrelazione, Parseval)",
-            font=("Segoe UI", 12, "bold")).pack(pady=10)
+                  font=("Segoe UI", 12, "bold")).pack(pady=10)
 
         # =========================
         # Graph Frame
@@ -478,53 +485,155 @@ class AudioDSPApp(tk.Tk):
 
         # =========================
         # Frame numeric analysis
-        # =========================
         analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Analisi numerica del segnale")
         analysis_frame.pack(fill="x", padx=10, pady=10)
 
         analysis_frame.columnconfigure(1, weight=1)
 
         # Energy & Power
-        # --- Energy (Original)
-        ttk.Label(analysis_frame, text="Original Signal Energy:").grid(row=0, column=0, sticky="w", padx=5)
+        def create_label_pair(frame, row, text, var):
+            ttk.Label(frame, text=text).grid(row=row, column=0, sticky="w", padx=5)
+            ttk.Label(frame, textvariable=var).grid(row=row, column=1, sticky="w")
+
         self.energy_orig_var = tk.StringVar(value="—")
-        ttk.Label(analysis_frame, textvariable=self.energy_orig_var).grid(row=0, column=1, sticky="w")
+        create_label_pair(analysis_frame, 0, "Original Signal Energy:", self.energy_orig_var)
 
-        # --- Energy (Modified)
-        ttk.Label(analysis_frame, text="Modified Signal Energy:").grid(row=1, column=0, sticky="w", padx=5)
         self.energy_mod_var = tk.StringVar(value="—")
-        ttk.Label(analysis_frame, textvariable=self.energy_mod_var).grid(row=1, column=1, sticky="w")
+        create_label_pair(analysis_frame, 1, "Modified Signal Energy:", self.energy_mod_var)
 
-        # --- Power (Original)
-        ttk.Label(analysis_frame, text="Original Signal Power:").grid(row=2, column=0, sticky="w", padx=5)
         self.power_orig_var = tk.StringVar(value="—")
-        ttk.Label(analysis_frame, textvariable=self.power_orig_var).grid(row=2, column=1, sticky="w")
+        create_label_pair(analysis_frame, 2, "Original Signal Power:", self.power_orig_var)
 
-        # --- Power (Modified)
-        ttk.Label(analysis_frame, text="Modified Signal Power:").grid(row=3, column=0, sticky="w", padx=5)
         self.power_mod_var = tk.StringVar(value="—")
-        ttk.Label(analysis_frame, textvariable=self.power_mod_var).grid(row=3, column=1, sticky="w")
-
-        # --- Parseval
-        ttk.Label(analysis_frame, text="Teorema di Parseval:").grid(row=2, column=0, sticky="w", padx=5)
-        self.parseval_var = tk.StringVar(value="—")
-        ttk.Label(analysis_frame, textvariable=self.parseval_var, font=("Segoe UI", 9, "bold")).grid(row=2, column=1,
-                                                                                                     sticky="w")
+        create_label_pair(analysis_frame, 3, "Modified Signal Power:", self.power_mod_var)
 
         # =========================
         # Dominant frequencies
-        # =========================
-        freq_frame = ttk.LabelFrame(self.tab_control_tab2, text="Frequenze dominanti (Top 10)")
+        freq_frame = ttk.LabelFrame(self.tab_control_tab2, text="Dominant Frequencies")
         freq_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
-        self.freq_text = tk.Text(freq_frame, height=6, width=60)
-        self.freq_text.pack(fill="both", expand=True, padx=5, pady=5)
-        self.freq_text.configure(state="disabled")
+        # Original signal
+        ttk.Label(freq_frame, text="Original Signal:").pack(anchor="w", padx=5)
+        self.freq_text_orig = tk.Text(freq_frame, height=6, wrap="word")
+        self.freq_text_orig.pack(fill="both", expand=True, padx=5, pady=2)
+        self.freq_text_orig.configure(state="disabled")
+
+        # Edited signal
+        ttk.Label(freq_frame, text="Edited Signal:").pack(anchor="w", padx=5)
+        self.freq_text_mod = tk.Text(freq_frame, height=6, wrap="word")
+        self.freq_text_mod.pack(fill="both", expand=True, padx=5, pady=2)
+        self.freq_text_mod.configure(state="disabled")
 
     # =========================
     # Audio GUI logic
     # =========================
+    def calculate_spectrogram(self):
+        """
+        Calculates and updates the spectrogram for the modified audio signal.
+
+        This method computes the spectrogram of the modified audio signal using specified
+        window and overlap sizes. The result is displayed in a pre-defined canvas associated
+        with the spectrogram visualization.
+
+        :raises ValueError: If the `audio_signal_modified` attribute is None, no spectrogram
+            calculation is performed.
+        """
+        if self.audio_signal_modified is None:
+            return
+
+        window_size = 256
+        overlap = 128
+
+        # Calcolo dello spettrogramma
+        fig = spectrogram_analysis(self.audio_signal_modified, self.fs, window_size=window_size, overlap=overlap,
+                                   title="Spectrogram (Modified Signal)")
+
+        # Aggiornamento del canvas
+        self.canvas_spectro.figure = fig
+        self.canvas_spectro.draw_idle()
+
+    def calculate_autocorrelation(self):
+        """
+        Calculates the autocorrelation of the modified audio signal and plots the result.
+
+        This method computes the autocorrelation of the `audio_signal_modified` if it is
+        not None. The autocorrelation is calculated using the `autocorrelation` function.
+        The resulting plot is created using Matplotlib, displaying the normalized
+        amplitude as a function of lag in seconds. The plot is titled and labeled, and
+        includes a grid for better readability. The canvas for the autocorrelation is
+        then updated with the new figure.
+
+        :raises ValueError: If `self.audio_signal_modified` is None or not properly
+            initialized, autocorrelation cannot be calculated.
+        """
+        if self.audio_signal_modified is None:
+            return
+
+        R = autocorrelation(self.audio_signal_modified)
+        t = np.arange(-len(self.audio_signal_modified) + 1, len(self.audio_signal_modified)) / self.fs
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(t, R)
+        ax.set_title("Autocorrelation (Modified Signal)")
+        ax.set_xlabel("Lag [s]")
+        ax.set_ylabel("Normalized Amplitude")
+        ax.grid(True)
+        fig.tight_layout()
+
+        # Aggiornamento del canvas
+        self.canvas_autocorr.figure = fig
+        self.canvas_autocorr.draw_idle()
+
+    def calculate_dominant_freqs(self):
+        """
+        Analyzes the frequency components of the original and modified audio signals and updates the
+        associated GUI text fields with the dominant frequencies.
+
+        This method processes both the original and edited audio signals to determine their dominant
+        frequencies using frequency analysis and updates the designated text fields in the application
+        to display the results. If no audio signal is available for analysis, a placeholder character
+        is inserted in the respective field.
+
+        :raises Exception: If the method indirectly interacts with GUI widgets in an unexpected
+            state, it may raise exceptions related to invalid operations or constraints.
+        """
+
+        # --- Original signal ---
+        self.freq_text_orig.configure(state="normal")
+        self.freq_text_orig.delete("1.0", tk.END)
+        if self.audio_signal is not None:
+            f_orig, X_orig = frequency_analysis(self.audio_signal, self.fs)
+            top_freqs_orig, _ = get_dominant_frequencies(f_orig, np.abs(X_orig), self.n_max)
+            for freq in top_freqs_orig:
+                self.freq_text_orig.insert(tk.END, f"{freq:.1f}Hz\n")
+        else:
+            self.freq_text_orig.insert(tk.END, "—")
+        self.freq_text_orig.configure(state="disabled")
+
+        # --- Edited signal ---
+        self.freq_text_mod.configure(state="normal")
+        self.freq_text_mod.delete("1.0", tk.END)
+        if self.audio_signal_modified is not None:
+            f_mod, X_mod = frequency_analysis(self.audio_signal_modified, self.fs)
+            top_freqs_mod, _ = get_dominant_frequencies(f_mod, np.abs(X_mod), self.n_max)
+            for freq in top_freqs_mod:
+                self.freq_text_mod.insert(tk.END, f"{freq:.1f}Hz\n")
+        else:
+            self.freq_text_mod.insert(tk.END, "—")
+        self.freq_text_mod.configure(state="disabled")
+
     def update_fields(self):
+        """
+        Updates specific fields related to audio signal characteristics.
+
+        This method calculates the energy and power of the `audio_signal` and
+        `audio_signal_modified` attributes and updates the corresponding variables
+        to reflect these calculations. Additionally, it computes and updates
+        dominant frequency values based on the modified signal.
+
+        :raises ValueError: If `audio_signal` or `audio_signal_modified` values
+            are invalid, this method does not perform calculations and exits gracefully.
+        """
         if self.audio_signal is None or self.audio_signal_modified is None:
             return
 
@@ -538,7 +647,21 @@ class AudioDSPApp(tk.Tk):
         self.power_orig_var.set(f"{power_orig:.3e}")
         self.power_mod_var.set(f"{power_mod:.3e}")
 
+        self.calculate_dominant_freqs()
+
     def update_plot(self):
+        """
+        Updates the plots for the audio signals and their frequency domain representations.
+
+        This method updates time-domain plots, spectrograms, autocorrelation, and frequency-domain representations for the
+        original and modified audio signals. It supports three types of frequency-domain analysis: magnitude spectrum, phase
+        spectrum, and 3-bands decomposition. The visualizations are rendered on the respective matplotlib axes.
+
+        :param self: The class instance containing necessary attributes and methods for updating plots.
+        :return: None.
+
+        :raise ValueError: Raised if an unsupported choice is encountered in the graph selection.
+        """
         if self.audio_signal_modified is None:
             return
 
@@ -557,6 +680,10 @@ class AudioDSPApp(tk.Tk):
         t_edited = np.arange(len(self.audio_signal_modified)) / self.fs
         plot_graph(t_edited, self.audio_signal_modified, "Time [s]", "Amplitude", self.ax_time2, self.canvas_time2,
                    "Modified Signal")
+
+        # Updating Spectrogram and Autocorrelation
+        self.calculate_spectrogram()
+        self.calculate_autocorrelation()
 
         if choice == "magnitude":
             # Original Signal
@@ -587,42 +714,58 @@ class AudioDSPApp(tk.Tk):
                        "FFT Phase")
 
         elif choice == "3bands":
-            # Original Signal
-            x_low, x_mid, x_high = split_into_3bands(self.audio_signal, self.fs)
-            f_l, X_l = frequency_analysis(x_low, self.fs)
-            f_m, X_m = frequency_analysis(x_mid, self.fs)
-            f_h, X_h = frequency_analysis(x_high, self.fs)
+            self.graph_plot3_update()
 
-            # Conditionally computes log magnitude for low, mid, high bands
-            if self.logMagnitude.get():
-                X_l_mag = 20 * np.log10(np.abs(X_l) + 1e-12)
-                X_m_mag = 20 * np.log10(np.abs(X_m) + 1e-12)
-                X_h_mag = 20 * np.log10(np.abs(X_h) + 1e-12)
-            else:
-                X_l_mag = np.abs(X_l)
-                X_m_mag = np.abs(X_m)
-                X_h_mag = np.abs(X_h)
-            plot_3graph(f_l, X_l_mag, f_m, X_m_mag, f_h, X_h_mag, self.ax_freq, self.canvas_freq,
-                        "Original Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
+    def graph_plot3_update(self):
+        """
+        Updates the plots for the frequency analysis of the original and edited audio signals,
+        split into three frequency bands (low, mid, high). The function visualizes the magnitude
+        spectra of these bands, either in linear or logarithmic scale, depending on configuration.
 
-            # Edited Signal
-            x_low_edited, x_mid_edited, x_high_edited = split_into_3bands(self.audio_signal_modified, self.fs)
-            f_l_edited, X_l_edited = frequency_analysis(x_low_edited, self.fs)
-            f_m_edited, X_m_edited = frequency_analysis(x_mid_edited, self.fs)
-            f_h_edited, X_h_edited = frequency_analysis(x_high_edited, self.fs)
+        :raises ValueError: If the audio signals are invalid or incompatible for analysis.
 
-            # Computes magnitude of edited signal bands; logarithmic if enabled
-            if self.logMagnitude.get():
-                X_l_mag_edited = 20 * np.log10(np.abs(X_l_edited) + 1e-12)
-                X_m_mag_edited = 20 * np.log10(np.abs(X_m_edited) + 1e-12)
-                X_h_mag_edited = 20 * np.log10(np.abs(X_h_edited) + 1e-12)
-            else:
-                X_l_mag_edited = np.abs(X_l_edited)
-                X_m_mag_edited = np.abs(X_m_edited)
-                X_h_mag_edited = np.abs(X_h_edited)
+        :param self: Reference to the instance of the class. Contains relevant attributes
+            like audio signals (`audio_signal`, `audio_signal_modified`), sampling frequency
+            (`fs`), plot axes (`ax_freq`, `ax_freq2`), and canvas objects (`canvas_freq`,
+            `canvas_freq2`). Additionally checks whether the log magnitude representation
+            (`logMagnitude`) is enabled.
+        """
+        # Original Signal
+        x_low, x_mid, x_high = split_into_3bands(self.audio_signal, self.fs)
+        f_l, X_l = frequency_analysis(x_low, self.fs)
+        f_m, X_m = frequency_analysis(x_mid, self.fs)
+        f_h, X_h = frequency_analysis(x_high, self.fs)
 
-            plot_3graph(f_l_edited, X_l_mag_edited, f_m_edited, X_m_mag_edited, f_h_edited, X_h_mag_edited,
-                        self.ax_freq2, self.canvas_freq2, "Modified Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
+        # Conditionally computes log magnitude for low, mid, high bands
+        if self.logMagnitude.get():
+            X_l_mag = 20 * np.log10(np.abs(X_l) + 1e-12)
+            X_m_mag = 20 * np.log10(np.abs(X_m) + 1e-12)
+            X_h_mag = 20 * np.log10(np.abs(X_h) + 1e-12)
+        else:
+            X_l_mag = np.abs(X_l)
+            X_m_mag = np.abs(X_m)
+            X_h_mag = np.abs(X_h)
+        plot_3graph(f_l, X_l_mag, f_m, X_m_mag, f_h, X_h_mag, self.ax_freq, self.canvas_freq,
+                    "Original Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
+
+        # Edited Signal
+        x_low_edited, x_mid_edited, x_high_edited = split_into_3bands(self.audio_signal_modified, self.fs)
+        f_l_edited, X_l_edited = frequency_analysis(x_low_edited, self.fs)
+        f_m_edited, X_m_edited = frequency_analysis(x_mid_edited, self.fs)
+        f_h_edited, X_h_edited = frequency_analysis(x_high_edited, self.fs)
+
+        # Computes magnitude of edited signal bands; logarithmic if enabled
+        if self.logMagnitude.get():
+            X_l_mag_edited = 20 * np.log10(np.abs(X_l_edited) + 1e-12)
+            X_m_mag_edited = 20 * np.log10(np.abs(X_m_edited) + 1e-12)
+            X_h_mag_edited = 20 * np.log10(np.abs(X_h_edited) + 1e-12)
+        else:
+            X_l_mag_edited = np.abs(X_l_edited)
+            X_m_mag_edited = np.abs(X_m_edited)
+            X_h_mag_edited = np.abs(X_h_edited)
+
+        plot_3graph(f_l_edited, X_l_mag_edited, f_m_edited, X_m_mag_edited, f_h_edited, X_h_mag_edited, self.ax_freq2,
+                    self.canvas_freq2, "Modified Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
 
     def update_modulation_controls(self, *args):  # TODO fix
         mod_type = self.mod_type_var.get()
