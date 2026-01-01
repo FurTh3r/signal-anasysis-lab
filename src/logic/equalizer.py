@@ -3,7 +3,7 @@ import numpy as np
 from src.logic.filters import fir_filter
 
 
-def split_into_3bands(x: np.ndarray, fs: int):
+def split_into_3bands(x: np.ndarray, fs: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Split the input signal into three frequency bands: low, mid, and high.
 
@@ -31,7 +31,7 @@ def split_into_3bands(x: np.ndarray, fs: int):
     return x_low, x_mid, x_high
 
 
-def merge_bands(x_low: int, x_mid: int, x_high: int):
+def merge_bands(x_low: np.ndarray, x_mid: np.ndarray, x_high: np.ndarray) -> np.ndarray:
     """
     Merge three integer bands into a single value.
 
@@ -42,18 +42,18 @@ def merge_bands(x_low: int, x_mid: int, x_high: int):
     manner.
 
     :param x_low: The value of the low band.
-    :type x_low: int
+    :type x_low: np.ndarray
     :param x_mid: The value of the mid band.
-    :type x_mid: int
+    :type x_mid: np.ndarray
     :param x_high: The value of the high band.
-    :type x_high: int
+    :type x_high: np.ndarray
     :return: The combined result of merging the three input bands.
-    :rtype: int
+    :rtype: np.ndarray
     """
     return x_low + x_mid + x_high
 
 
-def equalize(x: np.ndarray, low_gain: int, mid_gain: int, high_gain: int, fs: int):
+def equalize(x: np.ndarray, low_gain: float, mid_gain: float, high_gain: float, fs: int) -> np.ndarray:
     """
     Applies a 3-band equalization to the input signal by splitting it into low, mid,
     and high frequency bands, applying respective gain levels, and merging the bands

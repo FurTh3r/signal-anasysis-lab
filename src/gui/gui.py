@@ -92,22 +92,22 @@ def plot_3graph(x1, y1, x2, y2, x3, y3, ax, canvas, title="Signal Graph", xlabel
 
     ax.clear()
 
-    # Determina limiti asse x
+    # Determinating the limits of the x-axis
     xmin = min(np.min(x1), np.min(x2), np.min(x3))
     xmax = max(np.max(x1), np.max(x2), np.max(x3))
     ax.set_xlim(xmin, xmax)
 
-    # Determina limiti asse y
+    # Determinating the limits of the y-axis
     ymin = min(np.min(y1), np.min(y2), np.min(y3))
     ymax = max(np.max(y1), np.max(y2), np.max(y3))
     ax.set_ylim(1.1 * ymin, 1.1 * ymax)
 
-    # Plot delle tre serie
+    # Plot of the three signals
     ax.plot(x1, y1, label=labels[0])
     ax.plot(x2, y2, label=labels[1])
     ax.plot(x3, y3, label=labels[2])
 
-    # Titoli e label
+    # Titles and labels
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -133,12 +133,19 @@ def generate_sinusoid(frequency, amplitude, phase, duration, fs):
     return signal, t
 
 
-def show_error(message: str, title: str = "Errore"):
+def show_error(message: str, title: str = "Error"):
     """
-    Mostra una finestra di errore con messaggio e titolo.
+    Displays an error message in a message box with the provided title.
 
-    :param message: Testo dell'errore
-    :param title: Titolo della finestra (default: "Errore")
+    This function utilizes the `messagebox.showerror` method to display
+    an error dialog window with the specified message and an optional
+    title. The title defaults to "Error" if not provided.
+
+    :param message: The error message to be displayed in the dialog.
+    :type message: str
+    :param title: The title of the message box. Defaults to "Error".
+    :type title: str
+    :return: None
     """
     messagebox.showerror(title, message)
 
@@ -248,8 +255,8 @@ class AudioDSPApp(tk.Tk):
         self.tab_control_tab1 = ttk.Frame(self.tab_control)
         self.tab_control_tab2 = ttk.Frame(self.tab_control)
 
-        self.tab_control.add(self.tab_control_tab1, text='Elaborazione Audio')
-        self.tab_control.add(self.tab_control_tab2, text='Analisi del Segnale')
+        self.tab_control.add(self.tab_control_tab1, text='Audio Elaboration')
+        self.tab_control.add(self.tab_control_tab2, text='Signal Analysis')
 
         self.create_signal_analysis_tab()
         self.create_audio_control_tab()
@@ -375,7 +382,7 @@ class AudioDSPApp(tk.Tk):
 
         # =======================
         # Equalizer
-        frame_eq = ttk.Labelframe(left_frame, text="Equalizzatore")
+        frame_eq = ttk.Labelframe(left_frame, text="Equalizer")
         frame_eq.pack(fill="x", pady=10)
 
         self.low_gain = _create_vertical_slider(frame_eq, "Low", 1.0)
@@ -385,12 +392,12 @@ class AudioDSPApp(tk.Tk):
 
         # =======================
         # Modulation
-        frame_mod = ttk.Labelframe(left_frame, text="Modulazione")
+        frame_mod = ttk.Labelframe(left_frame, text="Modulation")
         frame_mod.pack(fill="x", pady=10)
 
         self.mod_type_var = tk.StringVar(value="AM")
         ttk.Label(frame_mod, text="Tipo").pack(side="left")
-        ttk.OptionMenu(frame_mod, self.mod_type_var, "AM", "AM", "DSB-SC", "FM").pack(side="left", padx=5)
+        ttk.OptionMenu(frame_mod, self.mod_type_var, "AM", "AM", "FM").pack(side="left", padx=5)
 
         ttk.Label(frame_mod, text="f_c [Hz]").pack(side="left", padx=(10, 2))
         self.fc_slider = tk.Scale(frame_mod, from_=100, to=20000, orient="horizontal", length=180, resolution=1)
@@ -404,9 +411,6 @@ class AudioDSPApp(tk.Tk):
 
         ttk.Checkbutton(frame_mod, text="Enable Modulation", variable=self.modulation_enabled).pack(side="left",
                                                                                                     padx=10)
-        self.mod_type_var.trace_add("write", self.update_modulation_controls)
-        self.update_modulation_controls()
-
         # =======================
         # Apply Processing
         ttk.Button(left_frame, text="Apply Processing", command=self.apply_processing).pack(pady=10)
@@ -455,8 +459,7 @@ class AudioDSPApp(tk.Tk):
     # TAB 2 – Signal Analysis
     # =========================
     def create_signal_analysis_tab(self):
-        ttk.Label(self.tab_control_tab2, text="Analisi avanzata (STFT, autocorrelazione, Parseval)",
-                  font=("Segoe UI", 12, "bold")).pack(pady=10)
+        ttk.Label(self.tab_control_tab2, text="Advanced analisys Tab", font=("Segoe UI", 12, "bold")).pack(pady=10)
 
         # =========================
         # Graph Frame
@@ -468,7 +471,7 @@ class AudioDSPApp(tk.Tk):
         graphs_frame.columnconfigure(1, weight=1)
 
         # --- STFT spectrum
-        spectro_frame = ttk.LabelFrame(graphs_frame, text="Spettrogramma (STFT)")
+        spectro_frame = ttk.LabelFrame(graphs_frame, text="Spectrogram (STFT)")
         spectro_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
 
         self.fig_spectro, self.ax_spectro = plt.subplots(figsize=(5, 3))
@@ -476,7 +479,7 @@ class AudioDSPApp(tk.Tk):
         self.canvas_spectro.get_tk_widget().pack(fill="both", expand=True)
 
         # --- Autocorrelation
-        autocorr_frame = ttk.LabelFrame(graphs_frame, text="Autocorrelazione")
+        autocorr_frame = ttk.LabelFrame(graphs_frame, text="Autocorrelation")
         autocorr_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 
         self.fig_autocorr, self.ax_autocorr = plt.subplots(figsize=(5, 3))
@@ -485,7 +488,7 @@ class AudioDSPApp(tk.Tk):
 
         # =========================
         # Frame numeric analysis
-        analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Analisi numerica del segnale")
+        analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Numerical Analysis of the Signal")
         analysis_frame.pack(fill="x", padx=10, pady=10)
 
         analysis_frame.columnconfigure(1, weight=1)
@@ -767,27 +770,6 @@ class AudioDSPApp(tk.Tk):
         plot_3graph(f_l_edited, X_l_mag_edited, f_m_edited, X_m_mag_edited, f_h_edited, X_h_mag_edited, self.ax_freq2,
                     self.canvas_freq2, "Modified Signal 3 Bands FFT", "Frequency [Hz]", "|X(f)|")
 
-    def update_modulation_controls(self, *args):  # TODO fix
-        mod_type = self.mod_type_var.get()
-
-        if not self.modulation_enabled.get():
-            self.fc_slider.config(state="disabled")
-            self.k_slider.config(state="disabled")
-            return
-
-        if mod_type == "AM":
-            self.fc_slider.config(state="normal")
-            self.k_slider.config(state="normal")
-        elif mod_type == "DSB-SC":
-            self.fc_slider.config(state="normal")
-            self.k_slider.config(state="disabled")
-        elif mod_type == "FM":
-            self.fc_slider.config(state="normal")
-            self.k_slider.config(state="normal")
-        else:
-            self.fc_slider.config(state="disabled")
-            self.k_slider.config(state="disabled")
-
     def load_audio(self):
         """
         Loads an audio file and initializes the audio signal and sampling frequency.
@@ -938,10 +920,10 @@ class AudioDSPApp(tk.Tk):
         # Save the edited audio
         save_audio(path, self.audio_signal_modified, self.fs)
 
-    def save_params(self):
+    def save_params(self):  # TODO
         pass
 
-    def load_params(self):
+    def load_params(self):  # TODO
         pass
 
     def apply_processing(self):

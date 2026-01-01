@@ -1,9 +1,8 @@
 import numpy as np
 
-from src.logic.IO import load_audio, to_mono
+from src.logic.IO import load_audio
 from src.logic.analysis import frequency_analysis, create_time_plot, create_frequency_plot, get_dominant_frequencies, \
     compute_energy_power, check_parseval_theorem, spectrogram_analysis, plot_fft_3d, autocorrelation_plot
-
 from src.logic.equalizer import split_into_3bands, equalize
 from src.logic.modulation import modulate_signal
 from src.logic.utils import plot_graph, plot_two_graphs_side_by_side, plot_bands_time, plot_bands_frequency
@@ -41,24 +40,16 @@ def pipeline_test():
     f_l, X_l = frequency_analysis(x_low, fs)
     f_m, X_m = frequency_analysis(x_mid, fs)
     f_h, X_h = frequency_analysis(x_high, fs)
-    plot_bands_frequency(f_l, np.abs(X_l), f_m, np.abs(X_m), f_h, np.abs(X_h), fs)
+    plot_bands_frequency(f_l, np.abs(X_l), f_m, np.abs(X_m), f_h, np.abs(X_h))
 
     equalized_signal = equalize(x, 0.8, 1.2, 1.5, fs)
 
     t = np.arange(len(x)) / fs
     t_eq = np.arange(len(equalized_signal)) / fs
 
-    plot_two_graphs_side_by_side(
-        t, x,
-        "Original signal",
-        "Time [s]",
-        "Amplitude",
+    plot_two_graphs_side_by_side(t, x, "Original signal", "Time [s]", "Amplitude",
 
-        t_eq, equalized_signal,
-        "Equalized signal",
-        "Time [s]",
-        "Amplitude"
-    )
+                                 t_eq, equalized_signal, "Equalized signal", "Time [s]", "Amplitude")
 
     # Signal modulation
     x_am = modulate_signal(equalized_signal, fs, 5000, k=0.5, mod_type='AM')
@@ -66,14 +57,19 @@ def pipeline_test():
     # Stft and visualization
     plot_graph(spectrogram_analysis(x_am, fs))
 
-    # Saving/Reproducing signal
-
-def main():
-    #pipeline_test()
+def application_start():
     from src.gui.gui import AudioDSPApp
     app = AudioDSPApp()
     app.mainloop()
     pass
+
+
+def main():
+    application = True
+    if application:
+        application_start()
+    else:
+        pipeline_test()
 
 
 if __name__ == "__main__":

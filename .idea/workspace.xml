@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/equalizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/equalizer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/filters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/gui.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logic/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +20,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="21" />
+    <option name="cachedIndexableFilesCount" value="20" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -57,22 +57,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Main.executor": "Run",
-    "Python.analysis.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.utils.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/loryp/PycharmProjects/PythonProject/data"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.analysis.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/loryp/PycharmProjects/PythonProject/data&quot;
   }
-}]]></component>
+}</component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1769166017551" />
     <option name="spentUsd" value="0.104598634" />
@@ -284,7 +284,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767198384575</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization.">
+      <option name="closed" value="true" />
+      <created>1767202981381</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1767202981381</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -302,6 +310,7 @@
     <MESSAGE value="Enhance GUI: Add signal generation controls, improved volume handling, and refactor log-scale frequency analysis logic" />
     <MESSAGE value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
     <MESSAGE value="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling" />
+    <MESSAGE value="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization." />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization." />
   </component>
 </project>

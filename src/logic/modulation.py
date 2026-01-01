@@ -4,7 +4,7 @@ import numpy as np
 def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type: str = 'AM') -> np.ndarray:
     """
     Modulates an input signal using the specified modulation type. This function supports amplitude
-    modulation (AM), double-sideband suppressed carrier modulation (DSB-SC), and frequency modulation (FM).
+    modulation (AM) and frequency modulation (FM).
 
     :param x: Input signal to be modulated.
     :type x: numpy.ndarray
@@ -14,7 +14,7 @@ def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type:
     :type fc: float
     :param k: Modulation index or sensitivity. Default is 1.0.
     :type k: float
-    :param mod_type: Type of modulation to apply ('AM', 'DSB-SC', or 'FM'). Case-insensitive.
+    :param mod_type: Type of modulation to apply ('AM', or 'FM'). Case-insensitive.
     :type mod_type: str
     :return: Modulated signal.
     :rtype: numpy.ndarray
@@ -25,11 +25,9 @@ def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type:
 
     if mod_type.upper() == 'AM':  # Amplitude Modulation
         y = (1 + k * x) * np.cos(wc * t)
-    elif mod_type.upper() == 'DSB-SC':  # DSB-SC modulation
-        y = x * np.cos(wc * t)
     elif mod_type.upper() == 'FM':  # Frequency modulation (cumulative sum for integral)
         y = np.cos(wc * t + k * np.cumsum(x) / fs)
     else:
-        raise ValueError("mod_type must be 'AM', 'DSB-SC', or 'FM'")
+        raise ValueError("mod_type must be 'AM' or 'FM'")
 
     return y

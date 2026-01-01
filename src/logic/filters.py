@@ -2,7 +2,7 @@ import numpy as np
 from scipy.signal import firwin, lfilter
 
 
-def fir_filter(x: np.ndarray, fs: int, cutoff, btype: str = 'low', numtaps: int = 101):
+def fir_filter(x: np.ndarray, fs: int, cutoff, btype: str = 'low', numtaps: int = 101) -> np.ndarray:
     """
     Designs and applies a Finite Impulse Response (FIR) filter to the input signal. The function allows for the creation
     of low-pass, high-pass, or band-pass filters based on the specified parameters. It leverages the window method

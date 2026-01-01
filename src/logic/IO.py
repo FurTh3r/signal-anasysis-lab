@@ -23,7 +23,7 @@ def load_audio(file_path: str) -> tuple[np.ndarray, int]:
 
 def to_mono(x: np.ndarray) -> np.ndarray:
     """
-    Convert a multi-dimensional audio signal array into a mono-dimensional signal.
+    Convert a multidimensional audio signal array into a mono-dimensional signal.
 
     This function processes audio signals represented as NumPy arrays. If the input
     is already a 1D array, it is returned as is. If the input is 2D, the function
