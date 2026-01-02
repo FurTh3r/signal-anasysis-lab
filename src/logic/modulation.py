@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type: str = 'AM') -> np.ndarray:
     """
     Modulates an input signal using the specified modulation type. This function supports amplitude
@@ -26,7 +25,10 @@ def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type:
     if mod_type.upper() == 'AM':  # Amplitude Modulation
         y = (1 + k * x) * np.cos(wc * t)
     elif mod_type.upper() == 'FM':  # Frequency modulation (cumulative sum for integral)
-        y = np.cos(wc * t + k * np.cumsum(x) / fs)
+        delta_f = fc * k
+        kf = 2 * np.pi * delta_f  # Hz deviation from carrier frequency
+        phase = wc * t + kf * np.cumsum(x) / fs
+        y = np.cos(phase)
     else:
         raise ValueError("mod_type must be 'AM' or 'FM'")
 

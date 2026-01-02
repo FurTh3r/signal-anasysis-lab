@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization.">
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Refactor and enhance: Update type hints, improve docstrings, and refine modulation logic. Remove DSB-SC support, adjust GUI labels, and fix inconsistencies in plot functions.">
+      <change afterPath="$PROJECT_DIR$/data/logChirpUp.wav" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/IO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/IO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/equalizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/equalizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/filters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logic/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +17,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="20" />
+    <option name="cachedIndexableFilesCount" value="21" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -292,7 +289,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767202981381</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Refactor and enhance: Update type hints, improve docstrings, and refine modulation logic. Remove DSB-SC support, adjust GUI labels, and fix inconsistencies in plot functions.">
+      <option name="closed" value="true" />
+      <created>1767263035202</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1767263035202</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -311,6 +316,7 @@
     <MESSAGE value="Enhance GUI: Add duration input for signal generation, error message pop-ups, and improved modulation controls" />
     <MESSAGE value="Enhance GUI and core logic: Add advanced signal analysis features, including energy and power computations, Parseval verification, improved plotting functions, and refined frequency analysis handling" />
     <MESSAGE value="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization." />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance GUI and signal analysis: Add autocorrelation, spectrogram analysis, and dominant frequency computation features. Improve variable management, plotting methods, and overall code organization." />
+    <MESSAGE value="Refactor and enhance: Update type hints, improve docstrings, and refine modulation logic. Remove DSB-SC support, adjust GUI labels, and fix inconsistencies in plot functions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor and enhance: Update type hints, improve docstrings, and refine modulation logic. Remove DSB-SC support, adjust GUI labels, and fix inconsistencies in plot functions." />
   </component>
 </project>

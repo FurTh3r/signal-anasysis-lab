@@ -9,8 +9,8 @@ import sounddevice as sd
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 from src.logic.IO import load_audio, save_audio
-from src.logic.analysis import frequency_analysis, compute_energy_power, get_dominant_frequencies, spectrogram_analysis, \
-    autocorrelation
+from src.logic.analysis import frequency_analysis, compute_energy_power, get_dominant_frequencies, autocorrelation, \
+    compute_short_time_fourier_transform
 from src.logic.equalizer import equalize, split_into_3bands
 from src.logic.modulation import modulate_signal
 
@@ -75,16 +75,34 @@ def plot_graph(x_values, y_values, x_name, y_name, ax, canvas, title="Signal Gra
 def plot_3graph(x1, y1, x2, y2, x3, y3, ax, canvas, title="Signal Graph", xlabel="X-axis", ylabel="Y-axis",
                 labels=("Series 1", "Series 2", "Series 3")):
     """
-    Plots three signals with independent x-values on the same axis with legend and grid.
+    Plots three graphs on a single axis, adjusting axis limits, labels, and titles. It also refreshes a provided canvas for
+    display updates.
 
-    :param x1, x2, x3: Arrays of x-axis values for each series
-    :param y1, y2, y3: Arrays of y-axis values for each series
-    :param ax: Matplotlib Axes object to plot on
-    :param canvas: Matplotlib canvas to refresh
-    :param title: Plot title
-    :param xlabel: X-axis label
-    :param ylabel: Y-axis label
-    :param labels: Tuple of labels for the three series
+    :param x1: First set of x-axis values
+    :type x1: array-like or list
+    :param y1: First set of y-axis values
+    :type y1: array-like or list
+    :param x2: Second set of x-axis values
+    :type x2: array-like or list
+    :param y2: Second set of y-axis values
+    :type y2: array-like or list
+    :param x3: Third set of x-axis values
+    :type x3: array-like or list
+    :param y3: Third set of y-axis values
+    :type y3: array-like or list
+    :param ax: The matplotlib axis object to plot the graphs on
+    :type ax: matplotlib.axes.Axes
+    :param canvas: The canvas associated with the axis for refreshing the display
+    :type canvas: matplotlib.backend_bases.FigureCanvasBase
+    :param title: Title of the graph, defaults to "Signal Graph"
+    :type title: str, optional
+    :param xlabel: Label for the x-axis, defaults to "X-axis"
+    :type xlabel: str, optional
+    :param ylabel: Label for the y-axis, defaults to "Y-axis"
+    :type ylabel: str, optional
+    :param labels: Tuple containing labels for the three series, defaults to ("Series 1", "Series 2", "Series 3")
+    :type labels: tuple, optional
+    :return: None
     """
     if (
             x1 is None or y1 is None or x2 is None or y2 is None or x3 is None or y3 is None or ax is None or canvas is None):
@@ -221,6 +239,7 @@ class AudioDSPApp(tk.Tk):
         self.top_freqs_orig_var = None
         self.freq_text_orig = None
         self.freq_text_mod = None
+        self._spectro_colorbar = None
 
         # =========================
         # Style Settings
@@ -532,14 +551,8 @@ class AudioDSPApp(tk.Tk):
     # =========================
     def calculate_spectrogram(self):
         """
-        Calculates and updates the spectrogram for the modified audio signal.
-
-        This method computes the spectrogram of the modified audio signal using specified
-        window and overlap sizes. The result is displayed in a pre-defined canvas associated
-        with the spectrogram visualization.
-
-        :raises ValueError: If the `audio_signal_modified` attribute is None, no spectrogram
-            calculation is performed.
+        Calculates and updates the spectrogram of the modified audio signal
+        using an object-oriented Matplotlib approach (GUI-safe).
         """
         if self.audio_signal_modified is None:
             return
@@ -547,27 +560,41 @@ class AudioDSPApp(tk.Tk):
         window_size = 256
         overlap = 128
 
-        # Calcolo dello spettrogramma
-        fig = spectrogram_analysis(self.audio_signal_modified, self.fs, window_size=window_size, overlap=overlap,
-                                   title="Spectrogram (Modified Signal)")
+        x = self.audio_signal_modified
+        fs = self.fs
 
-        # Aggiornamento del canvas
-        self.canvas_spectro.figure = fig
+        f, t, Zxx = compute_short_time_fourier_transform(x, fs, window_size=window_size, overlap=overlap)
+
+        magnitude_db = 20 * np.log10(np.abs(Zxx) + 1e-12)
+
+        self.ax_spectro.clear()
+        pcm = self.ax_spectro.pcolormesh(t, f, magnitude_db, shading="gouraud")
+
+        self.ax_spectro.set_title("Spectrogram (Modified Signal)")
+        self.ax_spectro.set_xlabel("Time [s]")
+        self.ax_spectro.set_ylabel("Frequency [Hz]")
+        self.ax_spectro.set_ylim(0, fs / 2)
+
+        if not hasattr(self, "_spectro_colorbar") or self._spectro_colorbar is None:
+            self._spectro_colorbar = self.fig_spectro.colorbar(pcm, ax=self.ax_spectro, label="Magnitude [dB]")
+        else:
+            self._spectro_colorbar.update_normal(pcm)
+
+        self.fig_spectro.tight_layout()
         self.canvas_spectro.draw_idle()
 
     def calculate_autocorrelation(self):
         """
-        Calculates the autocorrelation of the modified audio signal and plots the result.
+        Calculates and visualizes the autocorrelation of a modified audio signal.
 
-        This method computes the autocorrelation of the `audio_signal_modified` if it is
-        not None. The autocorrelation is calculated using the `autocorrelation` function.
-        The resulting plot is created using Matplotlib, displaying the normalized
-        amplitude as a function of lag in seconds. The plot is titled and labeled, and
-        includes a grid for better readability. The canvas for the autocorrelation is
-        then updated with the new figure.
+        This method computes the autocorrelation of the modified audio signal stored
+        in the instance and plots the resulting data. The autocorrelation indicates
+        how correlated the signal is with a time-shifted version of itself at
+        different lag periods. It is normalized to assess similarity independent of
+        signal amplitude, and the visualization is rendered on the associated plot.
 
-        :raises ValueError: If `self.audio_signal_modified` is None or not properly
-            initialized, autocorrelation cannot be calculated.
+        :raises RuntimeError: If the modified audio signal is not available or has not
+            been initialized.
         """
         if self.audio_signal_modified is None:
             return
@@ -575,16 +602,14 @@ class AudioDSPApp(tk.Tk):
         R = autocorrelation(self.audio_signal_modified)
         t = np.arange(-len(self.audio_signal_modified) + 1, len(self.audio_signal_modified)) / self.fs
 
-        fig, ax = plt.subplots(figsize=(10, 4))
-        ax.plot(t, R)
-        ax.set_title("Autocorrelation (Modified Signal)")
-        ax.set_xlabel("Lag [s]")
-        ax.set_ylabel("Normalized Amplitude")
-        ax.grid(True)
-        fig.tight_layout()
+        self.ax_autocorr.clear()
+        self.ax_autocorr.plot(t, R)
+        self.ax_autocorr.set_title("Autocorrelation (Modified Signal)")
+        self.ax_autocorr.set_xlabel("Lag [s]")
+        self.ax_autocorr.set_ylabel("Normalized Amplitude")
+        self.ax_autocorr.grid(True)
 
-        # Aggiornamento del canvas
-        self.canvas_autocorr.figure = fig
+        self.fig_autocorr.tight_layout()
         self.canvas_autocorr.draw_idle()
 
     def calculate_dominant_freqs(self):
