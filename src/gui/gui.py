@@ -1,3 +1,4 @@
+import sys
 import threading
 import tkinter as tk
 from tkinter import ttk, filedialog
@@ -69,6 +70,7 @@ def plot_graph(x_values, y_values, x_name, y_name, ax, canvas, title="Signal Gra
     ax.set_ylabel(y_name)
     ax.grid(True)
 
+    ax.figure.tight_layout()
     canvas.draw_idle()
 
 
@@ -132,6 +134,7 @@ def plot_3graph(x1, y1, x2, y2, x3, y3, ax, canvas, title="Signal Graph", xlabel
     ax.grid(True)
     ax.legend()
 
+    ax.figure.tight_layout()
     canvas.draw_idle()
 
 
@@ -240,6 +243,7 @@ class AudioDSPApp(tk.Tk):
         self.freq_text_orig = None
         self.freq_text_mod = None
         self._spectro_colorbar = None
+        self.autocorr_normalize_var = None
 
         # =========================
         # Style Settings
@@ -279,6 +283,28 @@ class AudioDSPApp(tk.Tk):
 
         self.create_signal_analysis_tab()
         self.create_audio_control_tab()
+
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        """
+        Handles the cleanup and termination process when closing the application.
+
+        This method ensures that all threads and resources used by the application
+        are properly released or stopped, including audio processing threads and
+        graphical resources.
+
+        :return: None
+        """
+        self.loop_enabled = False
+        self.stop_event.set()
+
+        if self.audio_thread is not None and self.audio_thread.is_alive():
+            self.audio_thread.join()
+
+        plt.close('all')
+
+        self.destroy()
 
     # =========================
     # TAB 1 – Audio Control
@@ -497,6 +523,10 @@ class AudioDSPApp(tk.Tk):
         self.canvas_spectro = FigureCanvasTkAgg(self.fig_spectro, master=spectro_frame)
         self.canvas_spectro.get_tk_widget().pack(fill="both", expand=True)
 
+        toolbar_time = NavigationToolbar2Tk(self.canvas_spectro, graphs_frame, pack_toolbar=False)
+        toolbar_time.update()
+        toolbar_time.grid(row=1, column=0, sticky="w")
+
         # --- Autocorrelation
         autocorr_frame = ttk.LabelFrame(graphs_frame, text="Autocorrelation")
         autocorr_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
@@ -505,6 +535,14 @@ class AudioDSPApp(tk.Tk):
         self.canvas_autocorr = FigureCanvasTkAgg(self.fig_autocorr, master=autocorr_frame)
         self.canvas_autocorr.get_tk_widget().pack(fill="both", expand=True)
 
+        toolbar_time = NavigationToolbar2Tk(self.canvas_autocorr, graphs_frame, pack_toolbar=False)
+        toolbar_time.update()
+        toolbar_time.grid(row=1, column=1, sticky="w")
+
+        self.autocorr_normalize_var = tk.BooleanVar(value=True)  # default: normalized
+        ttk.Checkbutton(autocorr_frame, text="Normalize Autocorrelation", variable=self.autocorr_normalize_var).pack(
+            anchor="w", padx=5, pady=2
+        )
         # =========================
         # Frame numeric analysis
         analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Numerical Analysis of the Signal")
@@ -599,14 +637,17 @@ class AudioDSPApp(tk.Tk):
         if self.audio_signal_modified is None:
             return
 
-        R = autocorrelation(self.audio_signal_modified)
+        normalize = self.autocorr_normalize_var.get()
+        R = autocorrelation(self.audio_signal_modified, normalize)
         t = np.arange(-len(self.audio_signal_modified) + 1, len(self.audio_signal_modified)) / self.fs
 
         self.ax_autocorr.clear()
         self.ax_autocorr.plot(t, R)
-        self.ax_autocorr.set_title("Autocorrelation (Modified Signal)")
+        title = "Autocorrelation Modified Signal (Normalized)" if normalize else "Autocorrelation Modified Signal"
+        self.ax_autocorr.set_title(title)
         self.ax_autocorr.set_xlabel("Lag [s]")
-        self.ax_autocorr.set_ylabel("Normalized Amplitude")
+        ylabel = "Normalized Amplitude" if normalize else "Amplitude"
+        self.ax_autocorr.set_ylabel(ylabel)
         self.ax_autocorr.grid(True)
 
         self.fig_autocorr.tight_layout()
@@ -859,21 +900,24 @@ class AudioDSPApp(tk.Tk):
         fs = self.fs
         N = len(x)
 
-        with sd.OutputStream(samplerate=fs, channels=1, dtype='float32') as stream:
-            while not self.stop_event.is_set():
-                i = 0
-                # Streams clipped audio blocks until end or stop
-                while i < N and not self.stop_event.is_set():
-                    block = x[i:i + block_size] * self.volume_slider.get()
+        try:
+            with sd.OutputStream(samplerate=fs, channels=1, dtype='float32') as stream:
+                while not self.stop_event.is_set():
+                    i = 0
+                    # Streams clipped audio blocks until end or stop
+                    while i < N and not self.stop_event.is_set():
+                        block = x[i:i + block_size] * self.volume_slider.get()
 
-                    # Clip and conversion
-                    block = np.clip(block, -1.0, 1.0).astype(np.float32)
+                        # Clip and conversion
+                        block = np.clip(block, -1.0, 1.0).astype(np.float32)
 
-                    stream.write(block.reshape(-1, 1))
-                    i += block_size
+                        stream.write(block.reshape(-1, 1))
+                        i += block_size
 
-                if not self.loop_enabled:
-                    break
+                    if not self.loop_enabled:
+                        break
+        except Exception as e:
+            print("Audio playback stopped:", e)
 
     def generate_sinusoid(self):
         """
