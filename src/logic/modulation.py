@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def modulate_signal(x: np.ndarray, fs: int, fc: float, k: float = 1.0, mod_type: str = 'AM') -> np.ndarray:
     """
     Modulates an input signal using the specified modulation type. This function supports amplitude

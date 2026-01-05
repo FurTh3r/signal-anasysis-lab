@@ -1,4 +1,3 @@
-import sys
 import threading
 import tkinter as tk
 from tkinter import ttk, filedialog
@@ -541,8 +540,7 @@ class AudioDSPApp(tk.Tk):
 
         self.autocorr_normalize_var = tk.BooleanVar(value=True)  # default: normalized
         ttk.Checkbutton(autocorr_frame, text="Normalize Autocorrelation", variable=self.autocorr_normalize_var).pack(
-            anchor="w", padx=5, pady=2
-        )
+            anchor="w", padx=5, pady=2)
         # =========================
         # Frame numeric analysis
         analysis_frame = ttk.LabelFrame(self.tab_control_tab2, text="Numerical Analysis of the Signal")
