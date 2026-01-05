@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.signal import stft
+from scipy.signal import stft, find_peaks
 
 from src.logic.utils import generate_2d_graph
 
@@ -107,28 +107,42 @@ def plot_fft_3d(x: np.ndarray, fs: int) -> plt.Figure:
 
 def get_dominant_frequencies(f: np.ndarray, X_mag: np.ndarray, N: int = 10) -> tuple[np.ndarray, np.ndarray]:
     """
-    Identifies the dominant frequencies and their respective magnitudes from a set of
-    frequencies and magnitudes captured in frequency domain data. The function returns
-    the top `N` dominant frequencies sorted in increasing order, along with their
-    corresponding magnitudes.
+    Identifies and returns the dominant frequencies and their corresponding magnitudes
+    from a given spectrum of frequencies and magnitude values. The function selects
+    peaks in the magnitude spectrum and orders them first by magnitude (descending) and
+    then by frequency (ascending).
 
-    :param f: A numpy array containing the frequency components.
-    :param X_mag: A numpy array containing the corresponding magnitudes of the frequency components.
-    :param N: An integer specifying the number of dominant frequencies to retrieve. Default is 10.
-    :return: A tuple containing two numpy arrays:
-        - The first array contains the `N` dominant frequencies in ascending order.
-        - The second array contains the magnitudes corresponding to the `N` dominant frequencies.
+    :param f: Array of frequencies corresponding to the spectrum.
+    :type f: np.ndarray
+    :param X_mag: Array of magnitudes corresponding to the spectrum.
+    :type X_mag: np.ndarray
+    :param N: Number of dominant frequencies to retrieve. Defaults to 10.
+    :type N: int
+    :return: A tuple containing two arrays: the dominant frequencies and their corresponding magnitudes.
+    :rtype: tuple[np.ndarray, np.ndarray]
     """
-    # Get indices of top N magnitudes
-    idx_topN = np.argsort(X_mag)[-N:]
+    N = min(N, len(X_mag))
 
-    # Sort these indices by frequency
-    idx_sorted_by_freq = idx_topN[np.argsort(f[idx_topN])]
+    # Set zero frequencies to zero magnitude
+    X_mag = X_mag.copy()
+    X_mag[f == 0] = 0
 
-    dominant_freqs = f[idx_sorted_by_freq]
-    dominant_mags = X_mag[idx_sorted_by_freq]
+    # Get peaks in the magnitude
+    peaks, properties = find_peaks(X_mag)
 
-    return dominant_freqs, dominant_mags
+    if len(peaks) == 0:
+        return np.array([]), np.array([])
+
+    # Orders by magnitude in descending order
+    idx_sorted_by_mag = peaks[np.argsort(X_mag[peaks])[::-1]]
+
+    # Taking only the first N frequencies
+    idx_selected = idx_sorted_by_mag[:N]
+
+    # Sorting by frequency in ascending order
+    idx_final = idx_selected[np.argsort(f[idx_selected])]
+
+    return f[idx_final], X_mag[idx_final]
 
 
 def compute_energy_power(x: np.ndarray) -> tuple[float, float]:

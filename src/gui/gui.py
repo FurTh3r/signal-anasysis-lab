@@ -393,7 +393,7 @@ class AudioDSPApp(tk.Tk):
         self.volume_value_label = ttk.Label(vol_frame, text="1.00")
         self.volume_value_label.pack()
 
-        self.volume_slider = tk.Scale(vol_frame, from_=1.0, to=0.0, resolution=0.01, orient="vertical", length=120,
+        self.volume_slider = tk.Scale(vol_frame, from_=2.0, to=0.0, resolution=0.02, orient="vertical", length=120,
                                       command=self.on_volume_change  # callback
                                       )
         self.volume_slider.set(1.0)
@@ -944,12 +944,6 @@ class AudioDSPApp(tk.Tk):
 
         # Save the edited audio
         save_audio(path, self.audio_signal_modified, self.fs)
-
-    def save_params(self):  # TODO
-        pass
-
-    def load_params(self):  # TODO
-        pass
 
     def apply_processing(self):
         """

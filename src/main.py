@@ -30,6 +30,10 @@ def pipeline_test():
     audio_file = "../data/logChirpUp.wav"  # path to audio
     modulation_type = 'FM'  # 'AM' or 'FM'
 
+    # Flags to enable/disable processing steps
+    modulation = False  # True = apply modulation, False = skip
+    equalization = False  # True = apply equalization, False = skip
+
     # Carrier parameters
     carrier_freq = 5000  # Hz
     modulation_index = 0.5  # AM: amplitude index, FM: frequency deviation factor
@@ -77,7 +81,10 @@ def pipeline_test():
     plot_bands_frequency(f_l, np.abs(X_l), f_m, np.abs(X_m), f_h, np.abs(X_h))
 
     # EQUALIZATION
-    equalized_signal = equalize(x, equalizer_low, equalizer_mid, equalizer_high, fs)
+    if equalization:
+        equalized_signal = equalize(x, equalizer_low, equalizer_mid, equalizer_high, fs)
+    else:
+        equalized_signal = x.copy()
 
     t = np.arange(len(x)) / fs
     t_eq = np.arange(len(equalized_signal)) / fs
@@ -86,8 +93,11 @@ def pipeline_test():
                                  "Equalized signal", "Time [s]", "Amplitude")
 
     # AM-FM MODULATION
-    modulated_signal = modulate_signal(equalized_signal, fs, fc=carrier_freq, k=modulation_index,
-                                       mod_type=modulation_type)
+    if modulation:
+        modulated_signal = modulate_signal(equalized_signal, fs, fc=carrier_freq, k=modulation_index,
+                                           mod_type=modulation_type)
+    else:
+        modulated_signal = equalized_signal.copy()
 
     # STFT / SPECTROGRAM
     plot_graph(spectrogram_analysis(modulated_signal, fs))
@@ -103,7 +113,7 @@ def application_start():
 
 
 def main():
-    application = False
+    application = True
 
     if application:
         application_start()
