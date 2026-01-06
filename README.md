@@ -14,6 +14,7 @@ through a graphical user interface.
 - matplotlib == 3.10.8
 - sounddevice == 0.5.3
 - soundfile == 0.13.1
+- messagebox
 
 ## Installation
 

@@ -167,7 +167,10 @@ def show_error(message: str, title: str = "Error"):
     :type title: str
     :return: None
     """
+    root = tk.Tk()
+    root.withdraw()
     messagebox.showerror(title, message)
+    root.destroy()
 
 
 class AudioDSPApp(tk.Tk):

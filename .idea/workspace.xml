@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    <list default="true" id="6291bf69-1deb-4655-ab20-c3b7dcb9b7cb" name="Changes" comment="Add requirements file, update README, and minor code formatting adjustments">
+      <change afterPath="$PROJECT_DIR$/data/DoCentrale.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/linearChirpUp.wav" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/PythonProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AudioDSP.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logic/modulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/logic/modulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +18,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="21" />
+    <option name="cachedIndexableFilesCount" value="23" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -54,22 +55,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.analysis.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/loryp/PycharmProjects/PythonProject/data&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Main.executor": "Run",
+    "Python.analysis.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.utils.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/loryp/PycharmProjects/AudioDSPProject",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1769166017551" />
     <option name="spentUsd" value="0.104598634" />
@@ -86,9 +88,9 @@
       <recent name="C:\Users\loryp\PycharmProjects\PythonProject\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
-    <configuration name="Main" type="PythonConfigurationType" factoryName="Python">
-      <module name="PythonProject" />
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AudioDSP" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -96,9 +98,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (PythonProject)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="net.ashald.envfile">
@@ -112,29 +113,6 @@
         </ENTRIES>
       </EXTENSION>
       <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="true" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="PythonProject" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -144,10 +122,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <list>
-      <item itemvalue="Python.Main" />
-      <item itemvalue="Python.main" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
@@ -321,7 +295,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767612349008</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Add requirements file, update README, and minor code formatting adjustments">
+      <option name="closed" value="true" />
+      <created>1767628301509</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1767628301509</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -344,6 +326,7 @@
     <MESSAGE value="Refactor and enhance: Improve modulation logic for FM signals, update spectrogram calculation methods with STFT, refine GUI plotting functions, and enhance docstrings and type hints." />
     <MESSAGE value="Refactor and enhance: Integrate peak detection in frequency analysis, adjust GUI volume slider behavior, improve docstrings, and add flags for modular signal processing steps." />
     <MESSAGE value="Enhance GUI and signal analysis: Add autocorrelation normalization toggle, update autocorrelation plotting, improve cleanup on app close, add toolbars to plots, and enhance error handling in audio playback." />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="Add requirements file, update README, and minor code formatting adjustments" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add requirements file, update README, and minor code formatting adjustments" />
   </component>
 </project>
